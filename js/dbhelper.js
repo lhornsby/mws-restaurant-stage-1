@@ -154,6 +154,20 @@ class DBHelper {
   }
 
   /**
+   * Restaurant resized image URLs.
+   */
+  static mediumImageUrlForRestaurant(restaurant) {
+    let photo = restaurant.photograph;
+    let medImg = photo.slice(0, 1);
+    return (`/images_sized/${medImg}-medium.jpg`);
+  }
+  static smallImageUrlForRestaurant(restaurant) {
+    let photo = restaurant.photograph;
+    let smallImg = photo.slice(0, 1);
+    return (`/images_sized/${smallImg}-small.jpg`);
+  }
+
+  /**
    * Map marker for a restaurant.
    */
   static mapMarkerForRestaurant(restaurant, map) {

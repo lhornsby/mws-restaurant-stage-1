@@ -438,7 +438,7 @@ nav h1 a {
 #restaurant-hours td {
   color: #666;
 }
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 768px) {
 	.inside #map-container {
 		position: relative;
 		height: 300px;
