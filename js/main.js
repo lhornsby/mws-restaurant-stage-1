@@ -4,6 +4,23 @@ let restaurants,
 var map
 var markers = []
 
+
+/**
+  * Register the service worker
+*/
+if (navigator.serviceWorker) {
+  navigator.serviceWorker.register('sw.js').then(function(reg){
+    //TODO: Any extra state-specific service worker functions later in the course
+    if(reg.installing) {
+
+    } else if(reg.waiting) {
+
+    } else if(reg.active) {
+
+    }
+  });
+}
+
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
@@ -12,12 +29,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
   fetchCuisines();
 });
 
-/**
-  * Register the service worker
-*/
-if (navigator.serviceWorker) {
-  navigator.serviceWorker.register('js/sw.js');
-}
 /**
  * Fetch all neighborhoods and set their HTML.
  */
@@ -151,7 +162,7 @@ createRestaurantHTML = (restaurant) => {
   //console.log('srcz', imgSrcs);
 
   image.className = 'restaurant-img';
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.src = DBHelper.mediumImageUrlForRestaurant(restaurant);
   image.sizes = '(max-width: 400px) 400px, 600px'
   image.srcset = imgSrcs;
   image.alt = restaurant.caption;
@@ -162,7 +173,9 @@ createRestaurantHTML = (restaurant) => {
   li.append(name);
 
   const neighborhood = document.createElement('span');
+  const neighborhoodAriaLabel = 'Neighborhood: '+ restaurant.neighborhood;
   neighborhood.className = 'restaurant-neighborhood';
+  neighborhood.setAttribute('aria-label', neighborhoodAriaLabel);
   neighborhood.innerHTML = restaurant.neighborhood;
   li.append(neighborhood);
 
@@ -171,8 +184,10 @@ createRestaurantHTML = (restaurant) => {
   li.append(address);
 
   const more = document.createElement('a');
+  const moreAriaLabel = 'View Details About ' + restaurant.name;
   more.innerHTML = 'View Details';
   more.href = DBHelper.urlForRestaurant(restaurant);
+  more.setAttribute('aria-label', moreAriaLabel);
   li.append(more)
 
   return li

@@ -23,6 +23,11 @@ module.exports = function(grunt) {
               width: 600,
               quality: 60
             },
+            {
+              name: "large",
+              width: 800,
+              quality: 60
+            },
           ]
         },
 

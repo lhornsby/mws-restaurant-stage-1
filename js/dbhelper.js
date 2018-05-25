@@ -156,6 +156,11 @@ class DBHelper {
   /**
    * Restaurant resized image URLs.
    */
+ static largeImageUrlForRestaurant(restaurant) {
+   let photo = restaurant.photograph;
+   let largeImg = photo.slice(0, 1);
+   return (`/images_sized/${largeImg}-large.jpg`);
+ }
   static mediumImageUrlForRestaurant(restaurant) {
     let photo = restaurant.photograph;
     let medImg = photo.slice(0, 1);

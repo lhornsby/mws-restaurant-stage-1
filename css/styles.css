@@ -63,7 +63,8 @@ section {
 }
 #maincontent {
   background-color: #f3f3f3;
-  min-height: 100%;
+  /* min-height: 100%; */
+  min-height: 100vh;
 }
 .main-home {
 	display: grid;
@@ -80,14 +81,9 @@ section {
 	}
 }
 .main-detail {
-	/* display: grid;
-	grid-template-columns: 1fr 1fr;
-	grid-template-rows: auto;
-	grid-template-areas:
-		"restaurant-container restaurant-container map-container map-container"; */
 	min-height: 100vh;
 }
-#footer {
+.site-footer {
   background-color: #444;
   color: #fff;
   font-size: 12px;
@@ -113,40 +109,39 @@ nav h1 a {
   letter-spacing: 10px;
   text-transform: uppercase;
 }
-#breadcrumb {
+.breadcrumb {
     padding: 10px 40px 16px;
     list-style: none;
     background-color: #dcdbdb;
     font-size: 17px;
     margin: 0;
 		border-bottom: 1px solid #333333;
-    /* width: calc(50% - 80px); */
 }
 @media screen and (max-width: 600px) {
-	#breadcrumb {
+	.breadcrumb {
 		width: auto;
 	}
 }
 /* Display list items side by side */
-#breadcrumb li {
+.breadcrumb li {
     display: inline;
 }
 
 /* Add a slash symbol (/) before/behind each list item */
-#breadcrumb li+li:before {
+.breadcrumb li+li:before {
     padding: 8px;
     color: black;
     content: "/\00a0";
 }
 
-/* Add a color to all links inside the list */
-#breadcrumb li a {
+/* Add a color to all links detail-page the list */
+.breadcrumb li a {
     color: #0275d8;
     text-decoration: none;
 }
 
 /* Add a color on mouse-over */
-#breadcrumb li a:hover {
+.breadcrumb li a:hover {
     color: #01447e;
     text-decoration: underline;
 }
@@ -210,8 +205,7 @@ nav h1 a {
 	}
 	.filter-group {
 		display: block;
-		margin-left: 0;
-		margin-bottom: 20px;
+    margin: 0 0 20px 0;
 	}
 	.filter-options label {
 		font-size: 1em;
@@ -321,35 +315,35 @@ nav h1 a {
 }
 
 /* ====================== Restaurant Details ====================== */
-.inside header {
+.detail-page header {
   position: fixed;
   top: 0;
   width: 100%;
   z-index: 1000;
 }
-.inside #map-container {
+.detail-page #map-container {
   background: blue none repeat scroll 0 0;
-  height: 87%;
+  height: 97%;
   position: fixed;
   right: 0;
   top: 80px;
   width: 50%;
 }
-.inside #map {
+.detail-page #map {
   background-color: #ccc;
   height: 100%;
   width: 100%;
 }
-.inside #footer {
+.detail-page .site-footer {
   bottom: 0;
   position: absolute;
   width: 100%;
 }
 
-#restaurant-container {
+.detail-container {
 	grid-area: restaurant-container;
 }
-#restaurant-name {
+.detail-name {
   color: #f18200;
   font-family: Arial,sans-serif;
   font-size: 24px;
@@ -359,14 +353,14 @@ nav h1 a {
   text-transform: uppercase;
   line-height: 1.1;
 }
-#restaurant-img {
+.detail-img {
 	max-width: 100%;
 }
-#restaurant-address {
+.detail-address {
   font-size: 14px;
   margin: 10px 0px;
 }
-#restaurant-cuisine {
+.detail-cuisine {
   background-color: #333;
   color: #ddd;
   font-size: 12px;
@@ -378,27 +372,27 @@ nav h1 a {
   text-transform: uppercase;
 	width: 100%;
 }
-#restaurant-container, #reviews-container {
+.detail-container, .reviews-container {
   border-bottom: 1px solid #d9d9d9;
   border-top: 1px solid #fff;
   padding: 140px 40px 30px;
   width: 50%;
 }
-#reviews-container {
+.reviews-container {
   padding: 30px 40px 80px;
 }
-#reviews-container h2 {
+.reviews-container h2 {
   color: #f58500;
   font-size: 22px;
   font-weight: 300;
   letter-spacing: -1px;
   padding-bottom: 1pt;
 }
-#reviews-list {
+.reviews-list {
   margin: 0;
   padding: 0;
 }
-#reviews-list li {
+.reviews-list li {
   background-color: #fff;
   border: 2px solid #161e38;
 	border-radius: 10px 10px 0 0;
@@ -409,7 +403,7 @@ nav h1 a {
   position: relative;
   width: 85%;
 }
-#reviews-list li p {
+.reviews-list li p {
   margin: 0 0 10px;
 
 }
@@ -431,36 +425,45 @@ nav h1 a {
 .review-comments {
 	padding: 0 20px 10px 20px;
 }
-#restaurant-hours {
+.detail-hours {
 	min-width: 80%;
 }
 
-#restaurant-hours td {
+.detail-hours td {
   color: #666;
 }
 @media screen and (max-width: 768px) {
-	.inside #map-container {
+	.detail-page #map-container {
 		position: relative;
 		height: 300px;
 		width: 100%;
 		top: 120px;
 	}
-	#restaurant-container, #reviews-container {
+	.detail-container, .reviews-container {
 		width: auto;
 	}
-	#restaurant-hours {
+	.detail-hours {
 		min-width: 90%;
 	}
-	#reviews-list li {
+	.reviews-list li {
 		width: auto;
 	}
 }
 /* ====================== Misc ====================== */
-.screen-reader-text {
+.screen-reader-text,
+.skip-link {
 	position: absolute;
 	left: -100000px;
 	top: auto;
 	width: 1px;
 	height: 1px;
 	overflow: hidden;
+}
+
+.skip-link:focus{
+  color: #ffffff;
+  top: 0;
+  left: 0px;
+  height: auto;
+  width: auto;
 }
