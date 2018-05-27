@@ -132,6 +132,11 @@ resetRestaurants = (restaurants) => {
   const ul = document.getElementById('restaurants-list');
   ul.innerHTML = '';
 
+  //Remove 'No Results for current filter' message
+  const noResultsMsg = document.getElementById('no-results-message');
+  noResultsMsg.innerHTML = '';
+  noResultsMsg.setAttribute('aria-hidden', 'true');
+
   // Remove all map markers
   self.markers.forEach(m => m.setMap(null));
   self.markers = [];
@@ -162,8 +167,8 @@ createRestaurantHTML = (restaurant) => {
   //console.log('srcz', imgSrcs);
 
   image.className = 'restaurant-img';
-  image.src = DBHelper.mediumImageUrlForRestaurant(restaurant);
-  image.sizes = '(max-width: 400px) 400px, 600px'
+  image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.sizes = '(max-width: 400px) 400px, (min-width: 401px) 600px'
   image.srcset = imgSrcs;
   image.alt = restaurant.caption;
   li.append(image);

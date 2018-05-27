@@ -72,7 +72,6 @@ section {
 	grid-template-rows: auto;
 	grid-template-areas:
 		"map-container map-container map-container map-container"
-		"restaurant-filters restaurant-filters restaurant-filters restaurant-filters"
 		"restaurant-list restaurant-list restaurant-list restaurant-list";
 }
 @media screen and (max-width: 800px) {
@@ -150,9 +149,14 @@ nav h1 a {
 	grid-area: map-container;
 }
 #map {
-  height: 350px;
+  height: 400px;
   width: 100%;
   background-color: #ccc;
+}
+@media screen and (max-width: 600px) {
+  #map {
+    height: 300px;
+  }
 }
 /* ====================== Restaurant Filtering ====================== */
 .filter-options {
@@ -199,6 +203,16 @@ nav h1 a {
 	margin-left: 20px;
 }
 
+.filter-message[aria-hidden="true"] {
+  margin: 0;
+  padding: 0;
+}
+.filter-message[aria-hidden="false"] {
+  margin: 100px auto;
+  padding: 20px;
+  font-size: 18px;
+  text-align: center;
+}
 @media screen and (max-width: 600px) {
 	.filter-options h2 {
 		max-width: 80%;

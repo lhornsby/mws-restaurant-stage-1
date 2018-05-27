@@ -62,7 +62,8 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   let imgSrcs = [ smImg, medImg, largeImg ].join(', ');
 
   image.className = 'detail-img'
-  image.src = DBHelper.largeImageUrlForRestaurant(restaurant);
+  image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.sizes = '(max-width: 400px) 400px, (min-width: 401px) 600px, 800px';
   image.srcset = imgSrcs;
   image.alt = restaurant.caption;
 
