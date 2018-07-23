@@ -56,11 +56,21 @@ module.exports = function(grunt) {
       },
     },
 
+    //Minify the IDB promis js file
+    uglify: {
+      my_target: {
+        files: {
+          'js/idb.min.js': ['js/idb.js']
+        }
+      }
+    },
+
   });
 
   grunt.loadNpmTasks('grunt-responsive-images');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-mkdir');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.registerTask('default', ['clean', 'mkdir', 'responsive_images']);
 };

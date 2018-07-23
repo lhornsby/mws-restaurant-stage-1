@@ -1,3 +1,5 @@
+
+
 /**
  * Common database helper functions.
  */
@@ -40,6 +42,7 @@ class DBHelper {
       callback(null, restaurants);
     }).catch(function(){
       const error = `Request failed :(`;
+      //TODO: if the request fails, use the IDB cache if we got it?
       callback(error, null);
     });
   }
@@ -207,3 +210,34 @@ class DBHelper {
   }
 
 }
+
+/* Setup IDB */
+const dbPromise = idb.open('restaurant-db', 5, (upgradeDb) => {
+  switch(upgradeDb.oldVersion){
+    case 0:
+      upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
+  }
+});
+/* Stuff in some data */
+dbPromise.then(function(db){
+  DBHelper.fetchRestaurants((error, restaurants) => {
+    if (error) {
+      //this error might need more functionality
+      //since this needs to work offline and getting no response
+      //would be an error
+      callback(error, null);
+    } else {
+      //make transactions first then put in objects
+      var tx = db.transaction('restaurants', 'readwrite');
+      var restaurantStore = tx.objectStore('restaurants');
+
+      for (var restaurant in restaurants) {
+        restaurantStore.put(restaurants[restaurant]);
+      }
+
+      return tx.complete;
+
+    }
+  });
+
+});
