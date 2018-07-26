@@ -17,22 +17,7 @@ class DBHelper {
   /**
    * Fetch all restaurants.
    */
-  // static fetchRestaurants(callback) {
-  //   let xhr = new XMLHttpRequest();
-  //   xhr.open('GET', DBHelper.DATABASE_URL);
-  //   xhr.onload = () => {
-  //     if (xhr.status === 200) { // Got a success response from server!
-  //       const restaurants = JSON.parse(xhr.responseText);
-  //
-  //       callback(null, restaurants);
-  //     } else { // Oops!. Got an error from server.
-  //       const error = (`Request failed. Returned status of ${xhr.status}`);
-  //       callback(error, null);
-  //     }
-  //   };
-  //   xhr.send();
-  // }
-  //Use Fetch instead of XHR but keep original up there for reference
+  //Use Fetch instead of XHR
   static fetchRestaurants(callback) {
     fetch(DBHelper.DATABASE_URL)
     .then(function(response) {
@@ -42,7 +27,9 @@ class DBHelper {
       callback(null, restaurants);
     }).catch(function(){
       const error = `Request failed :(`;
-      //TODO: if the request fails, use the IDB cache if we got it?
+
+      //TODO: if the request fails, do some error thing besides a console log?
+
       callback(error, null);
     });
   }
@@ -212,19 +199,17 @@ class DBHelper {
 }
 
 /* Setup IDB */
-const dbPromise = idb.open('restaurant-db', 5, (upgradeDb) => {
-  switch(upgradeDb.oldVersion){
-    case 0:
-      upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
-  }
+const dbPromise = idb.open('restaurant-db', 1, (upgradeDb) => {
+
+  var store = upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
+  store.createIndex('by-name', 'name');
+  store.createIndex('by-image', 'photograph');
+
 });
 /* Stuff in some data */
 dbPromise.then(function(db){
   DBHelper.fetchRestaurants((error, restaurants) => {
     if (error) {
-      //this error might need more functionality
-      //since this needs to work offline and getting no response
-      //would be an error
       callback(error, null);
     } else {
       //make transactions first then put in objects
