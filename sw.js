@@ -43,6 +43,7 @@ self.addEventListener('activate', function(event){
 self.addEventListener('fetch', function(event) {
   var requestUrl = new URL(event.request.url);
 
+  //console.log(event.request);
   if (requestUrl.origin === location.origin ) {
     if(requestUrl.pathname === '/') {
       event.respondWith(caches.match('index.html'));
@@ -59,7 +60,14 @@ self.addEventListener('fetch', function(event) {
       event.respondWith(getPhoto(event.request));
       return;
     }
+  }//end local origin requests
 
+  //If it's the request for Google Maps API,
+  //use 'new Response()' instead and set Headers to avoid CORS?
+  //maybe serve static map instead? maps.gstatic.com is address also sent
+  if ( requestUrl.origin === 'https://maps.googleapis.com' ) {
+    console.log('map!');
+    return;
   }
   event.respondWith(
     caches.match(event.request).then(function(response) {

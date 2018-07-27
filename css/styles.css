@@ -115,7 +115,7 @@ nav h1 a {
 .breadcrumb {
     padding: 10px 40px 16px;
     list-style: none;
-    background-color: #dcdbdb;
+    background-color: #e8e8e8;
     font-size: 17px;
     margin: 0;
 		border-bottom: 1px solid #333333;
@@ -139,7 +139,7 @@ nav h1 a {
 
 /* Add a color to all links detail-page the list */
 .breadcrumb li a {
-    color: #0275d8;
+    color: #398ed6;
     text-decoration: none;
 }
 
@@ -362,7 +362,7 @@ nav h1 a {
 	grid-area: restaurant-container;
 }
 .detail-name {
-  color: #f18200;
+  color: #ce7407;
   font-family: Arial,sans-serif;
   font-size: 24px;
   font-weight: 200;
@@ -400,11 +400,11 @@ nav h1 a {
   padding: 30px 40px 80px;
 }
 .reviews-container h2 {
-  color: #f58500;
+  color: #ce7407;
   font-size: 22px;
   font-weight: 300;
-  letter-spacing: -1px;
-  padding-bottom: 1pt;
+  letter-spacing: 0px;
+  padding-bottom: 5px;
 }
 .reviews-list {
   margin: 0;

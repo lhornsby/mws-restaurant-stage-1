@@ -166,11 +166,14 @@ createRestaurantHTML = (restaurant) => {
   let imgSrcs = [ smImg, medImg ].join(', ');
   //console.log('srcz', imgSrcs);
 
-  image.className = 'restaurant-img';
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
-  image.sizes = '(max-width: 400px) 400px, (min-width: 401px) 600px'
-  image.srcset = imgSrcs;
-  image.alt = restaurant.caption;
+  image.className = 'restaurant-img lazyload';
+//  image.src = DBHelper.imageUrlForRestaurant(restaurant);
+//  image.sizes = '(max-width: 400px) 400px, (min-width: 401px) 600px'
+//  image.srcset = imgSrcs;
+  image.setAttribute('data-src', DBHelper.imageUrlForRestaurant(restaurant) );
+  image.setAttribute('data-sizes', '(max-width: 400px) 400px, (min-width: 401px) 600px' );
+  image.setAttribute('data-srcset', imgSrcs);
+  image.alt = restaurant.name;
   li.append(image);
 
   const name = document.createElement('h3');
