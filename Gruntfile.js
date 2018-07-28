@@ -56,11 +56,37 @@ module.exports = function(grunt) {
       },
     },
 
+    //Minify the IDB promis js file
+    uglify: {
+      options: {
+       mangle: false
+     },
+      my_target: {
+        files: {
+        //  'js/idb.min.js': ['js/idb.js'],
+          'js/vendors.min.js': ['js/idb.js', 'js/lazysizes.min.js', 'ls.unveilhooks.min.js'],
+        }
+      }
+    },
+    critical: {
+        test: {
+            options: {
+                base: './',
+                css: [
+                    'css/styles.css',
+                ],
+            },
+            src: 'index.html',
+            dest: 'css/critical.css'
+        }
+    },
   });
 
   grunt.loadNpmTasks('grunt-responsive-images');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-mkdir');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-critical');
   grunt.registerTask('default', ['clean', 'mkdir', 'responsive_images']);
 };

@@ -1,6 +1,24 @@
 let restaurant;
 var map;
 
+
+/**
+  * Register the service worker
+*/
+if (navigator.serviceWorker) {
+  navigator.serviceWorker.register('sw.js').then(function(reg){
+    //TODO: Any extra state-specific service worker functions later in the course
+    if(reg.installing) {
+
+    } else if(reg.waiting) {
+
+    } else if(reg.active) {
+
+    }
+  });
+}
+
+
 /**
  * Initialize Google map, called from HTML.
  */
@@ -61,11 +79,14 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   let largeImg = DBHelper.largeImageUrlForRestaurant(restaurant) + " 800w";
   let imgSrcs = [ smImg, medImg, largeImg ].join(', ');
 
-  image.className = 'detail-img'
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
-  image.sizes = '(max-width: 400px) 400px, (min-width: 401px) 600px, 800px';
-  image.srcset = imgSrcs;
-  image.alt = restaurant.caption;
+  image.className = 'detail-img lazyload'
+  // image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  // image.sizes = '(max-width: 400px) 400px, (min-width: 401px) 600px, 800px';
+  // image.srcset = imgSrcs;
+  image.setAttribute('data-src', DBHelper.imageUrlForRestaurant(restaurant) );
+  image.setAttribute('data-sizes', '(max-width: 400px) 400px, (min-width: 401px) 600px, 800px' );
+  image.setAttribute('data-srcset', imgSrcs);
+  image.alt = restaurant.name;
 
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
