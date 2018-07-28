@@ -13,7 +13,7 @@ self.addEventListener('install', function(event) {
         //List of files
         [
           'css/styles.css',
-          'js/idb.min.js',
+          'js/vendors.min.js',
           'js/dbhelper.js',
           'js/main.js',
           'js/restaurant_info.js',
@@ -62,12 +62,13 @@ self.addEventListener('fetch', function(event) {
     }
   }//end local origin requests
 
+  //Try out doing some SW stuff for Google Maps later?
   //If it's the request for Google Maps API,
   //use 'new Response()' instead and set Headers to avoid CORS?
   //maybe serve static map instead? maps.gstatic.com is address also sent
   if ( requestUrl.origin === 'https://maps.googleapis.com' ) {
-    console.log('map!');
-    return;
+  //  console.log('map!');
+  //  return;
   }
   event.respondWith(
     caches.match(event.request).then(function(response) {

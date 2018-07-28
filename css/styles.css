@@ -153,13 +153,13 @@ nav h1 a {
 	grid-area: map-container;
 }
 #map {
-  height: 400px;
+  min-height: 400px;
   width: 100%;
   background-color: #ccc;
 }
 @media screen and (max-width: 600px) {
   #map {
-    height: 300px;
+    min-height: 250px;
   }
 }
 /* ====================== Restaurant Filtering ====================== */

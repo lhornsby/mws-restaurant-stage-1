@@ -162,8 +162,8 @@ createRestaurantHTML = (restaurant) => {
 
   const image = document.createElement('img');
   let smImg = DBHelper.smallImageUrlForRestaurant(restaurant) + " 400w";
-  let medImg = DBHelper.mediumImageUrlForRestaurant(restaurant) + " 600w";
-  let imgSrcs = [ smImg, medImg ].join(', ');
+  //let medImg = DBHelper.mediumImageUrlForRestaurant(restaurant) + " 600w";
+  let imgSrcs = [ smImg ].join(', ');
   //console.log('srcz', imgSrcs);
 
   image.className = 'restaurant-img lazyload';

@@ -1,6 +1,24 @@
 let restaurant;
 var map;
 
+
+/**
+  * Register the service worker
+*/
+if (navigator.serviceWorker) {
+  navigator.serviceWorker.register('sw.js').then(function(reg){
+    //TODO: Any extra state-specific service worker functions later in the course
+    if(reg.installing) {
+
+    } else if(reg.waiting) {
+
+    } else if(reg.active) {
+
+    }
+  });
+}
+
+
 /**
  * Initialize Google map, called from HTML.
  */
