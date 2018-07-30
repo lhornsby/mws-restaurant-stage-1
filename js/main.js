@@ -21,6 +21,46 @@ if (navigator.serviceWorker) {
   });
 }
 
+
+/**
+* Toggle filter bar on mobile size
+* if the max width is 600px, add .collapsed; add aria-hidden labels, remove class
+*/
+var filterElem = document.querySelector('#filter-bar');
+var filterGroup = filterElem.getElementsByClassName('filter-group');
+var mediaQueryFilter = window.matchMedia('(max-width: 600px)');
+
+function filterAria(currentClass){
+  for (var i = 0;  i < filterGroup.length; i++) {
+    if (currentClass.includes('collapsed') && mediaQueryFilter.matches) {
+      filterGroup[i].setAttribute('aria-hidden', 'true');
+    } else {
+      filterGroup[i].setAttribute('aria-hidden', 'false');
+    }
+  }
+}
+
+function mobileFilter(media) {
+  if (media.matches) {
+    filterElem.className = "filter-options collapsed";
+  } else {
+    filterElem.className = "filter-options";
+    filterAria(filterElem.classList.value);
+  }
+}
+
+//Open the filter when someone clicks the header
+function toggleFilterClass() {
+  filterElem.classList.toggle('collapsed');
+  filterAria(filterElem.classList.value);
+}
+var filterHeader = document.querySelector('.filter-header');
+window.addEventListener("load", function(e){
+  mediaQueryFilter.addListener(mobileFilter);
+  filterHeader.addEventListener('click', toggleFilterClass);
+  filterAria(filterElem.classList.value);
+});
+
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */

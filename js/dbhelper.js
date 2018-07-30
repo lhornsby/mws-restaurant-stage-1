@@ -106,7 +106,7 @@ class DBHelper {
         callback(null, results);
         //Error message in case there's no matching filterable results
         if (results === undefined || results.length === 0) {
-          console.log('empty results');
+          //console.log('empty results');
           const message = document.getElementById('no-results-message');
           message.innerHTML = 'No results for current filter.';
           message.setAttribute('aria-hidden', 'false');
