@@ -184,6 +184,7 @@ nav h1 a {
 
 .filter-options h2 {
   grid-area: filter-title;
+  z-index: 3;
   color: #ffffff;
   font-size: 1rem;
   font-weight: normal;
@@ -285,6 +286,7 @@ nav h1 a {
 /* ====================== Restaurant Listing ====================== */
 #restaurant-list-container {
 	grid-area: restaurant-list;
+  min-height: 630px;
 }
 #restaurants-list {
 	display: grid;

@@ -8,18 +8,18 @@ var markers = []
 /**
   * Register the service worker
 */
-if (navigator.serviceWorker) {
-  navigator.serviceWorker.register('sw.js').then(function(reg){
-    //TODO: Any extra state-specific service worker functions later in the course
-    if(reg.installing) {
-
-    } else if(reg.waiting) {
-
-    } else if(reg.active) {
-
-    }
-  });
-}
+// if (navigator.serviceWorker) {
+//   navigator.serviceWorker.register('sw.js').then(function(reg){
+//     //TODO: Any extra state-specific service worker functions later in the course
+//     if(reg.installing) {
+//
+//     } else if(reg.waiting) {
+//
+//     } else if(reg.active) {
+//
+//     }
+//   });
+// }
 
 
 /**
@@ -55,12 +55,41 @@ function toggleFilterClass() {
   filterAria(filterElem.classList.value);
 }
 var filterHeader = document.querySelector('.filter-header');
+
+
 window.addEventListener("load", function(e){
   mediaQueryFilter.addListener(mobileFilter);
   filterHeader.addEventListener('click', toggleFilterClass);
   filterAria(filterElem.classList.value);
 });
 
+var observerTarget;
+//Try Intersection Observer api, separate it out from other Load listener
+window.addEventListener("load", function(event) {
+  observerTarget = document.querySelector('#map');
+  observerMap();
+}, false);
+
+function observerMap() {
+  var observerOptions = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0
+  }
+  var observer = new IntersectionObserver(handleMap, observerOptions);
+  observer.observe(observerTarget);
+}
+//Check how close we are to the map based on IntersectionObserver entries
+function handleMap(entries, observer) {
+  for (entry of entries) {
+    if (entry.isIntersecting) {
+      loadJS('https://maps.googleapis.com/maps/api/js?key=AIzaSyCUsOidHgLJfN1lyG_NiuVACWAkaPX_gt8&libraries=places&callback=initMap');
+      observer.unobserve(observerTarget);
+    } else {
+      updateRestaurants();
+    }
+  }
+}
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
@@ -204,7 +233,6 @@ createRestaurantHTML = (restaurant) => {
   let smImg = DBHelper.smallImageUrlForRestaurant(restaurant) + " 400w";
   //let medImg = DBHelper.mediumImageUrlForRestaurant(restaurant) + " 600w";
   let imgSrcs = [ smImg ].join(', ');
-  //console.log('srcz', imgSrcs);
 
   image.className = 'restaurant-img lazyload';
 //  image.src = DBHelper.imageUrlForRestaurant(restaurant);
