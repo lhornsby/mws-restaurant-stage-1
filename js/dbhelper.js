@@ -21,18 +21,25 @@ class DBHelper {
   static fetchRestaurants(callback) {
     fetch(DBHelper.DATABASE_URL)
     .then(function(response) {
+      if (!response.ok) {
+        throw Error(response.status);
+      }
       return response.json();
     }).then(function(data){
       const restaurants = data;
+      stuffData(restaurants);
       callback(null, restaurants);
     }).catch(function(){
-      const error = `Request failed :(`;
-
-      //TODO: if the request fails, do some error thing besides a console log?
-
-      callback(error, null);
+      //TODO: The request failed, get all restaurants from IDB
+      const restaurants = nabData();
+      //const error = `Request failed :(`;
+      console.log('in the catch', restaurants);
+      callback(null, restaurants);
     });
   }
+
+//Make a static function that calls fetchRestaurants that resolves
+//the callback with an IDB transtion to the existing DB???
 
 
   /**
@@ -207,24 +214,24 @@ const dbPromise = idb.open('restaurant-db', 1, (upgradeDb) => {
 
 });
 /* Stuff in some data */
-dbPromise.then(function(db){
-  DBHelper.fetchRestaurants((error, restaurants) => {
-    if (error) {
-      callback(error, null);
-    } else {
-      //make transactions first then put in objects
-      var tx = db.transaction('restaurants', 'readwrite');
-      var restaurantStore = tx.objectStore('restaurants');
+function stuffData(restaurants) {
+  dbPromise.then(function(db){
+    var tx = db.transaction('restaurants', 'readwrite');
+    var restaurantStore = tx.objectStore('restaurants');
 
-      for (var restaurant in restaurants) {
-        restaurantStore.put(restaurants[restaurant]);
-      }
-
-      return tx.complete;
-
+    for (var restaurant in restaurants) {
+      restaurantStore.put(restaurants[restaurant]);
     }
+    return tx.complete;
   });
-
-
-
-});
+}
+/*Nab data */
+function nabData() {
+  return dbPromise.then(function(db){
+    var tx = db.transaction('restaurants', 'readonly');
+    var restaurantStore = tx.objectStore('restaurants');
+    var allItems = restaurantStore.getAll();
+    console.log('all items', allItems);
+    return restaurantStore.getAll();
+  });
+}

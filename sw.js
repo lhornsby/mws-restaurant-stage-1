@@ -15,6 +15,7 @@ self.addEventListener('install', function(event) {
           'css/styles.css',
           'js/vendors.min.js',
           'js/dbhelper.js',
+          'js/loadJS.js',
           'js/main.js',
           'js/restaurant_info.js',
           'index.html',
@@ -26,7 +27,7 @@ self.addEventListener('install', function(event) {
 });
 
 self.addEventListener('activate', function(event){
-  console.log('activated!');
+  console.log('activated!!!');
   event.waitUntil(
     caches.keys().then(function(cacheNames) {
       return Promise.all(
@@ -69,6 +70,11 @@ self.addEventListener('fetch', function(event) {
   if ( requestUrl.origin === 'https://maps.googleapis.com' ) {
   //  console.log('map!');
   //  return;
+  }
+
+  if (requestUrl.pathname === '/restaurants') {
+     console.log('restaurant url!', requestUrl);
+     return;
   }
   event.respondWith(
     caches.match(event.request).then(function(response) {

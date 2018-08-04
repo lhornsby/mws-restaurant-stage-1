@@ -8,18 +8,18 @@ var markers = []
 /**
   * Register the service worker
 */
-// if (navigator.serviceWorker) {
-//   navigator.serviceWorker.register('sw.js').then(function(reg){
-//     //TODO: Any extra state-specific service worker functions later in the course
-//     if(reg.installing) {
-//
-//     } else if(reg.waiting) {
-//
-//     } else if(reg.active) {
-//
-//     }
-//   });
-// }
+if (navigator.serviceWorker) {
+  navigator.serviceWorker.register('sw.js').then(function(reg){
+    //TODO: Any extra state-specific service worker functions later in the course
+    if(reg.installing) {
+    //  console.log('sw regist', self);
+    } else if(reg.waiting) {
+    //  console.log('sw waiting', self);
+    } else if(reg.active) {
+    //  console.log('sw active', self);
+    }
+  });
+}
 
 
 /**
