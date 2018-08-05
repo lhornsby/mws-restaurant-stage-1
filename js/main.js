@@ -83,8 +83,14 @@ function observerMap() {
 function handleMap(entries, observer) {
   for (entry of entries) {
     if (entry.isIntersecting) {
-      loadJS('https://maps.googleapis.com/maps/api/js?key=AIzaSyCUsOidHgLJfN1lyG_NiuVACWAkaPX_gt8&libraries=places&callback=initMap');
-      observer.unobserve(observerTarget);
+      //check if we're offline here for initializing map
+      if (navigator.onLine) {
+        loadJS('https://maps.googleapis.com/maps/api/js?key=AIzaSyCUsOidHgLJfN1lyG_NiuVACWAkaPX_gt8&libraries=places&callback=initMap');
+        observer.unobserve(observerTarget);
+      } else {
+        //serve image a background images if we're offline and can't get map API
+        initMap();
+      }
     } else {
       updateRestaurants();
     }
@@ -157,15 +163,20 @@ fillCuisinesHTML = (cuisines = self.cuisines) => {
  * Initialize Google map, called from HTML.
  */
 window.initMap = () => {
-  let loc = {
-    lat: 40.722216,
-    lng: -73.987501
-  };
-  self.map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 12,
-    center: loc,
-    scrollwheel: false
-  });
+  if (navigator.onLine) {
+    let loc = {
+      lat: 40.722216,
+      lng: -73.987501
+    };
+    self.map = new google.maps.Map(document.getElementById('map'), {
+      zoom: 12,
+      center: loc,
+      scrollwheel: false
+    });
+  } else {
+    //shove in a static image file of the map if we're offline
+    document.getElementById('map').style.backgroundImage = 'url(./img/static-map-orig-compressor.png)';
+  }
   updateRestaurants();
 }
 

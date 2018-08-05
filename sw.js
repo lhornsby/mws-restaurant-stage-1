@@ -1,4 +1,4 @@
-var mainCacheName = 'restaurant-cache-v3';
+var mainCacheName = 'restaurant-cache-v4';
 var imgsCache = 'restaurant-imgs';
 var allCaches = [
   mainCacheName,
@@ -20,6 +20,7 @@ self.addEventListener('install', function(event) {
           'js/restaurant_info.js',
           'index.html',
           'restaurant.html',
+          'img/static-map-orig-compressor.png'
         ]
       );
     })
@@ -63,18 +64,10 @@ self.addEventListener('fetch', function(event) {
     }
   }//end local origin requests
 
-  //Try out doing some SW stuff for Google Maps later?
-  //If it's the request for Google Maps API,
-  //use 'new Response()' instead and set Headers to avoid CORS?
-  //maybe serve static map instead? maps.gstatic.com is address also sent
-  if ( requestUrl.origin === 'https://maps.googleapis.com' ) {
-   console.log('map!');
-   return;
-  }
 
   if (requestUrl.pathname === '/restaurants') {
-     console.log('restaurant url!', requestUrl);
-     return;
+     // console.log('restaurant url!', requestUrl);
+     // return;
   }
   event.respondWith(
     caches.match(event.request).then(function(response) {
