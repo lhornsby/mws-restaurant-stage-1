@@ -29,18 +29,18 @@ class DBHelper {
       const restaurants = data;
       stuffData(restaurants);
       callback(null, restaurants);
-    }).catch(function(){
-      //TODO: The request failed, get all restaurants from IDB
-      const restaurants = nabData();
-      //const error = `Request failed :(`;
-      console.log('in the catch', restaurants);
-      callback(null, restaurants);
+    }).catch(err => {
+        console.log("no fetch for you!");
+        dbPromise.then(db => {
+          const tx = db.transaction("restaurants", "readonly");
+          const restaurantStore = tx.objectStore("restaurants");
+          restaurantStore.getAll().then(restaurantsIdb => {
+            callback(null, restaurantsIdb);
+          });
+
+      });
     });
   }
-
-//Make a static function that calls fetchRestaurants that resolves
-//the callback with an IDB transtion to the existing DB???
-
 
   /**
    * Fetch a restaurant by its ID.
@@ -223,15 +223,5 @@ function stuffData(restaurants) {
       restaurantStore.put(restaurants[restaurant]);
     }
     return tx.complete;
-  });
-}
-/*Nab data */
-function nabData() {
-  return dbPromise.then(function(db){
-    var tx = db.transaction('restaurants', 'readonly');
-    var restaurantStore = tx.objectStore('restaurants');
-    var allItems = restaurantStore.getAll();
-    console.log('all items', allItems);
-    return restaurantStore.getAll();
   });
 }

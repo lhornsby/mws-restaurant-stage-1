@@ -68,8 +68,8 @@ self.addEventListener('fetch', function(event) {
   //use 'new Response()' instead and set Headers to avoid CORS?
   //maybe serve static map instead? maps.gstatic.com is address also sent
   if ( requestUrl.origin === 'https://maps.googleapis.com' ) {
-  //  console.log('map!');
-  //  return;
+   console.log('map!');
+   return;
   }
 
   if (requestUrl.pathname === '/restaurants') {
