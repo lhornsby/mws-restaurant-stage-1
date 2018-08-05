@@ -21,19 +21,26 @@ class DBHelper {
   static fetchRestaurants(callback) {
     fetch(DBHelper.DATABASE_URL)
     .then(function(response) {
+      if (!response.ok) {
+        throw Error(response.status);
+      }
       return response.json();
     }).then(function(data){
       const restaurants = data;
+      stuffData(restaurants);
       callback(null, restaurants);
-    }).catch(function(){
-      const error = `Request failed :(`;
+    }).catch(err => {
+        console.log("no fetch for you!");
+        dbPromise.then(db => {
+          const tx = db.transaction("restaurants", "readonly");
+          const restaurantStore = tx.objectStore("restaurants");
+          restaurantStore.getAll().then(restaurantsIdb => {
+            callback(null, restaurantsIdb);
+          });
 
-      //TODO: if the request fails, do some error thing besides a console log?
-
-      callback(error, null);
+      });
     });
   }
-
 
   /**
    * Fetch a restaurant by its ID.
@@ -106,7 +113,7 @@ class DBHelper {
         callback(null, results);
         //Error message in case there's no matching filterable results
         if (results === undefined || results.length === 0) {
-          console.log('empty results');
+          //console.log('empty results');
           const message = document.getElementById('no-results-message');
           message.innerHTML = 'No results for current filter.';
           message.setAttribute('aria-hidden', 'false');
@@ -207,22 +214,14 @@ const dbPromise = idb.open('restaurant-db', 1, (upgradeDb) => {
 
 });
 /* Stuff in some data */
-dbPromise.then(function(db){
-  DBHelper.fetchRestaurants((error, restaurants) => {
-    if (error) {
-      callback(error, null);
-    } else {
-      //make transactions first then put in objects
-      var tx = db.transaction('restaurants', 'readwrite');
-      var restaurantStore = tx.objectStore('restaurants');
+function stuffData(restaurants) {
+  dbPromise.then(function(db){
+    var tx = db.transaction('restaurants', 'readwrite');
+    var restaurantStore = tx.objectStore('restaurants');
 
-      for (var restaurant in restaurants) {
-        restaurantStore.put(restaurants[restaurant]);
-      }
-
-      return tx.complete;
-
+    for (var restaurant in restaurants) {
+      restaurantStore.put(restaurants[restaurant]);
     }
+    return tx.complete;
   });
-
-});
+}

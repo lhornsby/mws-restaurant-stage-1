@@ -12,15 +12,90 @@ if (navigator.serviceWorker) {
   navigator.serviceWorker.register('sw.js').then(function(reg){
     //TODO: Any extra state-specific service worker functions later in the course
     if(reg.installing) {
-
+    //  console.log('sw regist', self);
     } else if(reg.waiting) {
-
+    //  console.log('sw waiting', self);
     } else if(reg.active) {
-
+    //  console.log('sw active', self);
     }
   });
 }
 
+
+/**
+* Toggle filter bar on mobile size
+* if the max width is 600px, add .collapsed; add aria-hidden labels, remove class
+*/
+var filterElem = document.querySelector('#filter-bar');
+var filterGroup = filterElem.getElementsByClassName('filter-group');
+var mediaQueryFilter = window.matchMedia('(max-width: 600px)');
+
+function filterAria(currentClass){
+  for (var i = 0;  i < filterGroup.length; i++) {
+    if (currentClass.includes('collapsed') && mediaQueryFilter.matches) {
+      filterGroup[i].setAttribute('aria-hidden', 'true');
+    } else {
+      filterGroup[i].setAttribute('aria-hidden', 'false');
+    }
+  }
+}
+
+function mobileFilter(media) {
+  if (media.matches) {
+    filterElem.className = "filter-options collapsed";
+  } else {
+    filterElem.className = "filter-options";
+    filterAria(filterElem.classList.value);
+  }
+}
+
+//Open the filter when someone clicks the header
+function toggleFilterClass() {
+  filterElem.classList.toggle('collapsed');
+  filterAria(filterElem.classList.value);
+}
+var filterHeader = document.querySelector('.filter-header');
+
+
+window.addEventListener("load", function(e){
+  mediaQueryFilter.addListener(mobileFilter);
+  filterHeader.addEventListener('click', toggleFilterClass);
+  filterAria(filterElem.classList.value);
+});
+
+var observerTarget;
+//Try Intersection Observer api, separate it out from other Load listener
+window.addEventListener("load", function(event) {
+  observerTarget = document.querySelector('#map');
+  observerMap();
+}, false);
+
+function observerMap() {
+  var observerOptions = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0
+  }
+  var observer = new IntersectionObserver(handleMap, observerOptions);
+  observer.observe(observerTarget);
+}
+//Check how close we are to the map based on IntersectionObserver entries
+function handleMap(entries, observer) {
+  for (entry of entries) {
+    if (entry.isIntersecting) {
+      //check if we're offline here for initializing map
+      if (navigator.onLine) {
+        loadJS('https://maps.googleapis.com/maps/api/js?key=AIzaSyCUsOidHgLJfN1lyG_NiuVACWAkaPX_gt8&libraries=places&callback=initMap');
+        observer.unobserve(observerTarget);
+      } else {
+        //serve image a background images if we're offline and can't get map API
+        initMap();
+      }
+    } else {
+      updateRestaurants();
+    }
+  }
+}
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
@@ -88,15 +163,20 @@ fillCuisinesHTML = (cuisines = self.cuisines) => {
  * Initialize Google map, called from HTML.
  */
 window.initMap = () => {
-  let loc = {
-    lat: 40.722216,
-    lng: -73.987501
-  };
-  self.map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 12,
-    center: loc,
-    scrollwheel: false
-  });
+  if (navigator.onLine) {
+    let loc = {
+      lat: 40.722216,
+      lng: -73.987501
+    };
+    self.map = new google.maps.Map(document.getElementById('map'), {
+      zoom: 12,
+      center: loc,
+      scrollwheel: false
+    });
+  } else {
+    //shove in a static image file of the map if we're offline
+    document.getElementById('map').style.backgroundImage = 'url(./img/static-map-orig-compressor.png)';
+  }
   updateRestaurants();
 }
 
@@ -164,7 +244,6 @@ createRestaurantHTML = (restaurant) => {
   let smImg = DBHelper.smallImageUrlForRestaurant(restaurant) + " 400w";
   //let medImg = DBHelper.mediumImageUrlForRestaurant(restaurant) + " 600w";
   let imgSrcs = [ smImg ].join(', ');
-  //console.log('srcz', imgSrcs);
 
   image.className = 'restaurant-img lazyload';
 //  image.src = DBHelper.imageUrlForRestaurant(restaurant);
