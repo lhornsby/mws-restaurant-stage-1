@@ -49,6 +49,28 @@
       <!-- Beginning reviews -->
       <section id="reviews-container" class="reviews-container">
         <ul id="reviews-list" class="reviews-list"></ul>
+
+        <h3>Leave a Review!</h3>
+        <form id="reviews-form" action="" method="post" data-restaurant="">
+          <label for="form-name">Name</label>
+          <input type="text" id="form-name" placeholder="Your Name" name="name"/>
+          <fieldset>
+            <legend>Restaurant Rating</legend>
+            <input id="form-rate-1" type="radio" value="1" />
+            <label for="form-rate-1">1</label>
+            <input id="form-rate-2" type="radio" value="2" />
+            <label for="form-rate-2">2</label>
+            <input id="form-rate-3" type="radio" value="3" />
+            <label for="form-rate-3">3</label>
+            <input id="form-rate-4" type="radio" value="4" />
+            <label for="form-rate-4">4</label>
+            <input id="form-rate-5" type="radio" value="5" />
+            <label for="form-rate-5">5</label>
+          </fieldset>
+          <label for="form-comments">Comments</label>
+          <textarea id="form-comments"placeholder="Add your comments" name="comments"></textarea>
+          <input type="submit" name="form-submit" value="Submit Your Review" />
+        </form>
       </section>
       <!-- End reviews -->
     </main>

@@ -15,6 +15,15 @@ class DBHelper {
   }
 
   /**
+  * Reviews Endpoint
+  *
+  */
+  static get REVIEWS_URL() {
+    const port = 1337
+    return `http://localhost:${port}/reviews`;
+  }
+
+  /**
    * Fetch all restaurants.
    */
   //Use Fetch instead of XHR
@@ -27,6 +36,7 @@ class DBHelper {
       return response.json();
     }).then(function(data){
       const restaurants = data;
+      //debugger;
       stuffData(restaurants);
       callback(null, restaurants);
     }).catch(err => {
@@ -43,6 +53,29 @@ class DBHelper {
   }
 
   /**
+  * Fetch all reviews
+  */
+  static fetchReviews(callback) {
+    fetch(DBHelper.REVIEWS_URL)
+    .then(function(response) {
+      if (!response.ok) {
+        throw Error(response.status);
+      }
+      console.log('review response', response);
+      return response.json();
+
+    }).then(function(data){
+      const reviews = data;
+    //  debugger;
+      //Stuff data into IDB later
+      //
+      callback(null, reviews);
+    }).catch(err => {
+      console.log('no fetch for you!');
+    });
+  }
+
+  /**
    * Fetch a restaurant by its ID.
    */
   static fetchRestaurantById(id, callback) {
@@ -52,7 +85,7 @@ class DBHelper {
         callback(error, null);
       } else {
         const restaurant = restaurants.find(r => r.id == id);
-      //  debugger;
+       //debugger;
         if (restaurant) { // Got the restaurant
           callback(null, restaurant);
         } else { // Restaurant does not exist in the database
@@ -60,6 +93,39 @@ class DBHelper {
         }
       }
     });
+  }
+
+  /**
+  * Fetch a review by the Restaurant ID
+  * endpoint is http://localhost:1337/reviews/?restaurant_id=1
+  */
+  static fetchReviewByRestaurantID(id, callback){
+    DBHelper.fetchReviews((error, reviews) => {
+      if (error) {
+        callback(error, null);
+      } else {
+        //Find only the reviews that have the current restaurant id
+        const review = reviews.filter( function(r) {
+          if (r.restaurant_id == id) {
+            return r;
+          }
+        });
+        //debugger;
+        //console.log('review???', review);
+        if (review) {
+          callback(null, review)
+        } else {
+          callback('No Review Found', null);
+        }
+      }
+    });
+  }
+  /**
+  * Fetch a review by the Review ID
+  * not sure I'll need this just yet?
+  */
+  static fetchReviewByID(id, callback){
+
   }
 
   /**

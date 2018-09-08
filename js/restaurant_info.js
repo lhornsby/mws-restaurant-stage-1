@@ -1,4 +1,5 @@
 let restaurant;
+let reviews;
 var map;
 
 
@@ -96,7 +97,9 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
     fillRestaurantHoursHTML();
   }
   // fill reviews
-  fillReviewsHTML();
+  //fillReviewsHTML(restaurant.id);
+  DBHelper.fetchReviewByRestaurantID(restaurant.id, fillReviewsHTML);
+  //debugger;
 }
 
 /**
@@ -121,13 +124,17 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
 
 /**
  * Create all reviews HTML and add them to the webpage.
+ * previously used reviews = self.restaurant.reviews as param
  */
-fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+fillReviewsHTML = (error, reviews) => {
+  self.restaurant.reviews = reviews;
+
+//  console.log('reviews?', reviews);
   const container = document.getElementById('reviews-container');
   const title = document.createElement('h2');
   title.innerHTML = 'Reviews';
   container.appendChild(title);
-
+  //debugger;
   if (!reviews) {
     const noReviews = document.createElement('p');
     noReviews.innerHTML = 'No reviews yet!';
@@ -153,7 +160,8 @@ createReviewHTML = (review) => {
 
   const date = document.createElement('p');
   date.className = 'review-date';
-  date.innerHTML = review.date;
+  //make a new Date to translate the createdAt data
+  date.innerHTML = review.createdAt; //previously review.date in Stage 2
   li.appendChild(date);
 
   const rating = document.createElement('p');
