@@ -158,10 +158,13 @@ createReviewHTML = (review) => {
   name.innerHTML = review.name;
   li.appendChild(name);
 
+  let reviewDate = new Date(review.createdAt);
+  let reviewFormatDate = reviewDate.toLocaleDateString();
+
   const date = document.createElement('p');
   date.className = 'review-date';
   //make a new Date to translate the createdAt data
-  date.innerHTML = review.createdAt; //previously review.date in Stage 2
+  date.innerHTML = reviewFormatDate; //previously review.date in Stage 2
   li.appendChild(date);
 
   const rating = document.createElement('p');

@@ -61,17 +61,22 @@ class DBHelper {
       if (!response.ok) {
         throw Error(response.status);
       }
-      console.log('review response', response);
       return response.json();
-
     }).then(function(data){
       const reviews = data;
     //  debugger;
-      //Stuff data into IDB later
-      //
+      //Stuff data into IDB
+      stuffReviewData(reviews);
       callback(null, reviews);
     }).catch(err => {
       console.log('no fetch for you!');
+      dbPromise.then(db =>{
+        const tx = db.transaction("reviews", "readonly");
+        const reviewStore = tx.objectStore("reviews");
+        reviewStore.getAll().then(reviewsIdb => {
+          callback(null, reviewsIdb);
+        });
+      });
     });
   }
 
@@ -278,6 +283,9 @@ const dbPromise = idb.open('restaurant-db', 1, (upgradeDb) => {
   store.createIndex('by-name', 'name');
   store.createIndex('by-image', 'photograph');
 
+  var reviewStore = upgradeDb.createObjectStore('reviews', {keyPath: 'id'});
+  reviewStore.createIndex('by-restaurant', 'restaurant_id');
+
 });
 /* Stuff in some data */
 function stuffData(restaurants) {
@@ -287,6 +295,17 @@ function stuffData(restaurants) {
 
     for (var restaurant in restaurants) {
       restaurantStore.put(restaurants[restaurant]);
+    }
+    return tx.complete;
+  });
+}
+function stuffReviewData(reviews) {
+  dbPromise.then(function(db){
+    var tx = db.transaction('reviews', 'readwrite');
+    var reviewStore = tx.objectStore('reviews');
+
+    for (var review in reviews) {
+      reviewStore.put(reviews[review]);
     }
     return tx.complete;
   });
