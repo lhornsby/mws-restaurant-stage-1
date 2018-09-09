@@ -65,12 +65,47 @@ fetchRestaurantFromURL = (callback) => {
 }
 
 /**
+* Favorite Restaurant Functionality
+*/
+favRestaurant = (restaurant = self.restaurant) => {
+  const favBtn = document.getElementById('restaurant-fav');
+  //Change out the icon / text based on if is_fav is set
+  // un-filled heart icon: far fa-heart
+  // filled heart icon: fas fa-heart
+  //have to check if it's a string value because Json Responses will do that to ya
+  const favStatus = (restaurant.is_favorite && restaurant.is_favorite.toString() === "true") ? true : false;
+
+  if (favStatus) {
+    favBtn.setAttribute('aria-label', 'Unfavorite This Restaurant');
+    favBtn.innerHTML = '<i class="fas fa-heart"></i> UnFav';
+  } else {
+    favBtn.setAttribute('aria-label', 'Favorite This Restaurant');
+    favBtn.innerHTML = '<i class="far fa-heart"></i> Fav';
+  }
+
+  favBtn.onclick = event => handleFavClick(favStatus);
+}
+
+handleFavClick = (favStatus) => {
+  restaurant = self.restaurant;
+  console.log('you clicked it');
+  console.log('check restaurant', restaurant);
+  //i'm changing it to a string, oops
+  console.log('status', favStatus);
+  restaurant.is_favorite = !favStatus;
+  console.log('change', restaurant.is_favorite);
+
+  //http://localhost:1337/restaurants/<restaurant_id>/?is_favorite=true
+  DBHelper.updateFav(restaurant.id, restaurant.is_favorite);
+}
+
+/**
  * Create restaurant HTML and add it to the webpage
  */
 fillRestaurantHTML = (restaurant = self.restaurant) => {
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
-
+  favRestaurant();
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
 

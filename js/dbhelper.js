@@ -261,6 +261,34 @@ class DBHelper {
   }
 
   /**
+  * Restaurant favorite call
+  */
+  static updateFav(id, favState) {
+    const favURL = DBHelper.DATABASE_URL + `/${id}/?is_favorite=${favState}`;
+    console.log('favURL', favURL);
+    console.log('change to', favState);
+    //PUT that URL up there at some point
+    fetch(favURL, {method: 'PUT'})
+    .then( () => {
+      console.log('it changed');
+      //access the restaurant store
+      dbPromise.then(function(db){
+        var tx = db.transaction('restaurants', 'readwrite');
+        var restaurantStore = tx.objectStore('restaurants');
+        //put new fav status based on restaurant id
+        restaurantStore.get(id)
+        .then( restaurant => {
+          restaurant.is_favorite = favState;
+          restaurantStore.put(restaurant);
+          debugger;
+        });
+      });
+    }).catch( err => {
+      console.log('no favoriting');
+    });
+  }
+
+  /**
    * Map marker for a restaurant.
    */
   static mapMarkerForRestaurant(restaurant, map) {
@@ -282,6 +310,7 @@ const dbPromise = idb.open('restaurant-db', 1, (upgradeDb) => {
   var store = upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
   store.createIndex('by-name', 'name');
   store.createIndex('by-image', 'photograph');
+  store.createIndex('by-favs', 'is_favorite');
 
   var reviewStore = upgradeDb.createObjectStore('reviews', {keyPath: 'id'});
   reviewStore.createIndex('by-restaurant', 'restaurant_id');
