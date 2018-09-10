@@ -88,10 +88,12 @@ favRestaurant = (restaurant = self.restaurant) => {
 changeFavBtn = (btn, favStatus) => {
   if (favStatus) {
     favBtn.setAttribute('aria-label', 'Unfavorite This Restaurant');
-    favBtn.innerHTML = '<i class="fas fa-heart"></i> UnFav';
+    favBtn.innerHTML = '&#9829; UnFav';
+    favBtn.className = 'btn-favorited';
   } else {
     favBtn.setAttribute('aria-label', 'Favorite This Restaurant');
-    favBtn.innerHTML = '<i class="far fa-heart"></i> Fav';
+    favBtn.innerHTML = '&#9829; Fav';
+    favBtn.className = '';
   }
 }
 
