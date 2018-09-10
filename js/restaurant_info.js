@@ -73,23 +73,17 @@ favRestaurant = (restaurant = self.restaurant) => {
   // un-filled heart icon: far fa-heart
   // filled heart icon: fas fa-heart
   //have to check if it's a string value because Json Responses will do that to ya
-  const favStatus = (restaurant.is_favorite && restaurant.is_favorite.toString() === "true") ? true : false;
-  changeFavBtn(favBtn, favStatus);
-  favBtn.onclick = event => handleFavClick(favStatus);
-}
-
-handleFavClick = (favStatus) => {
-  restaurant = self.restaurant;
-  console.log('you clicked it');
-  console.log('check restaurant', restaurant);
-  //i'm changing it to a string, oops
-  console.log('status', favStatus);
-  restaurant.is_favorite = !favStatus;
-  console.log('change', restaurant.is_favorite);
-  //http://localhost:1337/restaurants/<restaurant_id>/?is_favorite=true
-  DBHelper.updateFav(restaurant.id, restaurant.is_favorite);
+  favBtn.onclick = () => {
+    const favStatus = (restaurant.is_favorite && restaurant.is_favorite.toString() === "true") ? true : false;
+    restaurant.is_favorite = !favStatus;
+    DBHelper.updateFav(restaurant.id, restaurant.is_favorite);
+    //debugger;
+    changeFavBtn(favBtn, restaurant.is_favorite);
+  }
+//  debugger;
   changeFavBtn(favBtn, restaurant.is_favorite);
 }
+
 
 changeFavBtn = (btn, favStatus) => {
   if (favStatus) {

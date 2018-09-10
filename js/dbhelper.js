@@ -265,12 +265,9 @@ class DBHelper {
   */
   static updateFav(id, favState) {
     const favURL = DBHelper.DATABASE_URL + `/${id}/?is_favorite=${favState}`;
-    console.log('favURL', favURL);
-    console.log('change to', favState);
     //PUT that URL up there at some point
     fetch(favURL, {method: 'PUT'})
     .then( () => {
-      console.log('it changed');
       //access the restaurant store
       dbPromise.then(function(db){
         var tx = db.transaction('restaurants', 'readwrite');
