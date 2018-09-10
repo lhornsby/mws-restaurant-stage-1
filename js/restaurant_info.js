@@ -84,7 +84,6 @@ favRestaurant = (restaurant = self.restaurant) => {
   changeFavBtn(favBtn, restaurant.is_favorite);
 }
 
-
 changeFavBtn = (btn, favStatus) => {
   if (favStatus) {
     favBtn.setAttribute('aria-label', 'Unfavorite This Restaurant');
@@ -130,9 +129,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
     fillRestaurantHoursHTML();
   }
   // fill reviews
-  //fillReviewsHTML(restaurant.id);
   DBHelper.fetchReviewByRestaurantID(restaurant.id, fillReviewsHTML);
-  //debugger;
 }
 
 /**
@@ -178,6 +175,7 @@ fillReviewsHTML = (error, reviews) => {
     ul.appendChild(createReviewHTML(review));
   });
   container.appendChild(ul);
+  reviewForm();
 }
 
 /**
@@ -211,6 +209,41 @@ createReviewHTML = (review) => {
 
   return li;
 }
+/**
+* Handle Review Form submission
+*/
+reviewForm = (restaurant=self.restaurant) => {
+  //put current restaurant's id into hidden input field
+  const formID = document.getElementById('form-restaurant-id');
+  formID.value = restaurant.id;
+  //on form submit, handle through POST endpoint
+  // http://localhost:1337/reviews/
+}
+submitReview = () => {
+  event.preventDefault();
+  console.log('review submit btn press');
+  //get values from form fields
+  const reviewRest = document.querySelector("input[name='restaurant_id']");
+  const reviewName = document.querySelector("input[name='name']");
+  const reviewRating = document.querySelectorAll("input[name='rating']");
+  let ratingValue = '';
+  //need to look for "checked" value
+  for (var i = 0, length = reviewRating.length; i < length; i ++) {
+    if (reviewRating[i].checked) {
+      ratingValue = reviewRating[i].value;
+      break;
+    }
+  }
+  const reviewComments = document.querySelector("textarea[name='comments']");
+  const reviewData = {
+    "restaurant_id": parseInt(reviewRest.value),
+    "name": reviewName.value,
+    "rating": parseInt(ratingValue),
+    "comments": reviewComments.value,
+  }
+  console.log('datas', reviewData);
+}
+
 
 /**
  * Add restaurant name to the breadcrumb navigation menu
