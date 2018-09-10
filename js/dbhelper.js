@@ -280,7 +280,6 @@ class DBHelper {
         .then( restaurant => {
           restaurant.is_favorite = favState;
           restaurantStore.put(restaurant);
-          debugger;
         });
       });
     }).catch( err => {

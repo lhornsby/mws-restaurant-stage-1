@@ -299,6 +299,23 @@ nav h1 a {
   text-align: center;
 }
 
+button,
+input[type="submit"] {
+  background-color: #3397db;
+  padding: 10px 20px;
+  font-size: 14px;
+  border: 0;
+  margin: 5px 0;
+  color: #fff;
+  cursor: pointer;
+  display: block;
+}
+
+button:hover,
+input[type="submit"]:hover {
+  background-color: #2d78ab;
+}
+
 @media screen and (min-width: 600px) and (max-width:899px) {
 	#restaurants-list {
 		grid-template-columns: 1fr 1fr;
@@ -441,8 +458,46 @@ nav h1 a {
   padding: 140px 40px 30px;
   width: 50%;
 }
-.reviews-container {
+#reviews-form-container {
   padding: 30px 40px 80px;
+  width: 50%;
+}
+/*Form Stuff on Reviews */
+label {
+  display: block;
+  font-weight: bold;
+}
+input,
+textarea {
+  padding: 10px;
+  font-size: 16px;
+}
+input[type="text"],
+textarea {
+  width: 100%;
+}
+textarea {
+  min-height: 150px;
+}
+fieldset {
+  border: none;
+  margin: 10px 0;
+  padding: 0;
+}
+fieldset legend {
+  font-weight: bold;
+}
+fieldset label,
+fieldset input {
+  display: inline-block;
+}
+fieldset label {
+  margin-right: 20px;
+  font-weight: normal;
+}
+
+.reviews-container {
+  padding: 30px 40px 60px;
 }
 .reviews-container h2 {
   color: #ce7407;

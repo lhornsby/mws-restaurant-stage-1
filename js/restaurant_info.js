@@ -67,22 +67,14 @@ fetchRestaurantFromURL = (callback) => {
 /**
 * Favorite Restaurant Functionality
 */
+const favBtn = document.getElementById('restaurant-fav');
 favRestaurant = (restaurant = self.restaurant) => {
-  const favBtn = document.getElementById('restaurant-fav');
   //Change out the icon / text based on if is_fav is set
   // un-filled heart icon: far fa-heart
   // filled heart icon: fas fa-heart
   //have to check if it's a string value because Json Responses will do that to ya
   const favStatus = (restaurant.is_favorite && restaurant.is_favorite.toString() === "true") ? true : false;
-
-  if (favStatus) {
-    favBtn.setAttribute('aria-label', 'Unfavorite This Restaurant');
-    favBtn.innerHTML = '<i class="fas fa-heart"></i> UnFav';
-  } else {
-    favBtn.setAttribute('aria-label', 'Favorite This Restaurant');
-    favBtn.innerHTML = '<i class="far fa-heart"></i> Fav';
-  }
-
+  changeFavBtn(favBtn, favStatus);
   favBtn.onclick = event => handleFavClick(favStatus);
 }
 
@@ -94,9 +86,19 @@ handleFavClick = (favStatus) => {
   console.log('status', favStatus);
   restaurant.is_favorite = !favStatus;
   console.log('change', restaurant.is_favorite);
-
   //http://localhost:1337/restaurants/<restaurant_id>/?is_favorite=true
   DBHelper.updateFav(restaurant.id, restaurant.is_favorite);
+  changeFavBtn(favBtn, restaurant.is_favorite);
+}
+
+changeFavBtn = (btn, favStatus) => {
+  if (favStatus) {
+    favBtn.setAttribute('aria-label', 'Unfavorite This Restaurant');
+    favBtn.innerHTML = '<i class="fas fa-heart"></i> UnFav';
+  } else {
+    favBtn.setAttribute('aria-label', 'Favorite This Restaurant');
+    favBtn.innerHTML = '<i class="far fa-heart"></i> Fav';
+  }
 }
 
 /**
@@ -164,12 +166,11 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
 fillReviewsHTML = (error, reviews) => {
   self.restaurant.reviews = reviews;
 
-//  console.log('reviews?', reviews);
   const container = document.getElementById('reviews-container');
   const title = document.createElement('h2');
   title.innerHTML = 'Reviews';
   container.appendChild(title);
-  //debugger;
+
   if (!reviews) {
     const noReviews = document.createElement('p');
     noReviews.innerHTML = 'No reviews yet!';
