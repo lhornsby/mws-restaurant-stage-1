@@ -118,7 +118,7 @@ nav h1 a {
 .breadcrumb {
     padding: 10px 40px 16px;
     list-style: none;
-    background-color: #e8e8e8;
+    background-color: #ffffff;
     font-size: 17px;
     margin: 0;
 		border-bottom: 1px solid #333333;
@@ -463,6 +463,10 @@ input[type="submit"]:hover {
   width: 50%;
 }
 /*Form Stuff on Reviews */
+form {
+  margin-bottom: 30px;
+}
+
 label {
   display: block;
   font-weight: bold;
@@ -497,7 +501,7 @@ fieldset label {
 }
 
 .reviews-container {
-  padding: 30px 40px 60px;
+  padding: 30px 40px 30px;
 }
 .reviews-container h2 {
   color: #ce7407;
@@ -557,7 +561,9 @@ fieldset label {
 		width: 100%;
 		top: 120px;
 	}
-	.detail-container, .reviews-container {
+	.detail-container,
+  .reviews-container,
+  #reviews-form-container {
 		width: auto;
 	}
 	.detail-hours {
