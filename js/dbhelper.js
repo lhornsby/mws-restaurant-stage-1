@@ -125,12 +125,34 @@ class DBHelper {
       }
     });
   }
-  /**
-  * Fetch a review by the Review ID
-  * not sure I'll need this just yet?
-  */
-  static fetchReviewByID(id, callback){
 
+  /**
+  * POST new review
+  */
+  static postNewReview(newReview){
+    const reviewURL = DBHelper.REVIEWS_URL;
+    console.log('review data to dbhelper', newReview);
+    debugger;
+    //add the parameters of the data to the fetch options cuz it's not going now
+    fetch(reviewURL, {
+      method: 'POST',
+      body: JSON.stringify(newReview),
+    })
+    .then( () => {
+      //after posting it, shove it into IDB i hope
+      dbPromise.then(function(db){
+        // var tx = db.transaction('restaurants', 'readwrite');
+        // var reviewsStore = tx.objectStore('reviews');
+        // reviewsStore.get(newReview.restaurant_id)
+        // .then( review => {
+        //   reviewStore.put(review);
+        // });
+      });
+    }).catch( err => {
+      console.log('no new review posted' );
+      //if it can't post, give 'offline' message somewhere here
+
+    });
   }
 
   /**

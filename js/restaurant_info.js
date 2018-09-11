@@ -206,8 +206,9 @@ createReviewHTML = (review) => {
   comments.className = 'review-comments';
   comments.innerHTML = review.comments;
   li.appendChild(comments);
-
+    console.log('review html added');
   return li;
+
 }
 /**
 * Handle Review Form submission
@@ -240,8 +241,13 @@ submitReview = () => {
     "name": reviewName.value,
     "rating": parseInt(ratingValue),
     "comments": reviewComments.value,
+    "createdAt": Date.now(),
   }
   console.log('datas', reviewData);
+  //DBHelper function to submit to db next (checks if online or not)
+  DBHelper.postNewReview(reviewData);
+  //add to actual page
+  document.getElementById('reviews-list').appendChild(createReviewHTML(reviewData));
 }
 
 
