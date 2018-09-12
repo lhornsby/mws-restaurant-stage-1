@@ -36,7 +36,6 @@ class DBHelper {
       return response.json();
     }).then(function(data){
       const restaurants = data;
-      //debugger;
       stuffData(restaurants);
       callback(null, restaurants);
     }).catch(err => {
@@ -64,19 +63,9 @@ class DBHelper {
       return response.json();
     }).then(function(data){
       const reviews = data;
-    //  debugger;
-      //Stuff data into IDB
-      stuffReviewData(reviews);
       callback(null, reviews);
     }).catch(err => {
       console.log('no fetch for you!');
-      dbPromise.then(db =>{
-        const tx = db.transaction("reviews", "readonly");
-        const reviewStore = tx.objectStore("reviews");
-        reviewStore.getAll().then(reviewsIdb => {
-          callback(null, reviewsIdb);
-        });
-      });
     });
   }
 
@@ -90,7 +79,6 @@ class DBHelper {
         callback(error, null);
       } else {
         const restaurant = restaurants.find(r => r.id == id);
-       //debugger;
         if (restaurant) { // Got the restaurant
           callback(null, restaurant);
         } else { // Restaurant does not exist in the database
@@ -100,12 +88,33 @@ class DBHelper {
     });
   }
 
+  /*
+  * Fetch Review For Restaurant Detail
+  */
+  static fetchRestaurantDetailReview(id, callback){
+    var detailPageReviewURL = DBHelper.REVIEWS_URL + `/?restaurant_id=${id}`;
+    console.log('detail url', detailPageReviewURL);
+    fetch(detailPageReviewURL)
+    .then(function(response) {
+      if (!response.ok) {
+        throw Error(response.status);
+      }
+      return response.json();
+    }).then(function(data){
+      const reviews = data;
+      callback(null, reviews);
+    }).catch(err => {
+      console.log('no fetch for you on this detail page!');
+    });
+  }
+
   /**
   * Fetch a review by the Restaurant ID
   * endpoint is http://localhost:1337/reviews/?restaurant_id=1
   */
+  //USE THIS TO FILL IDB
   static fetchReviewByRestaurantID(id, callback){
-    DBHelper.fetchReviews((error, reviews) => {
+    DBHelper.fetchRestaurantDetailReview( id, (error, reviews) => {
       if (error) {
         callback(error, null);
       } else {
@@ -115,10 +124,10 @@ class DBHelper {
             return r;
           }
         });
-        //debugger;
-        //console.log('review???', review);
         if (review) {
-          callback(null, review)
+          callback(null, review);
+          //Stuff data into IDB
+          stuffReviewData(review);
         } else {
           callback('No Review Found', null);
         }
@@ -131,23 +140,15 @@ class DBHelper {
   */
   static postNewReview(newReview){
     const reviewURL = DBHelper.REVIEWS_URL;
-    console.log('review data to dbhelper', newReview);
-    debugger;
+    // console.log('review data to dbhelper', newReview);
     //add the parameters of the data to the fetch options cuz it's not going now
     fetch(reviewURL, {
       method: 'POST',
       body: JSON.stringify(newReview),
     })
     .then( () => {
-      //after posting it, shove it into IDB i hope
-      dbPromise.then(function(db){
-        // var tx = db.transaction('restaurants', 'readwrite');
-        // var reviewsStore = tx.objectStore('reviews');
-        // reviewsStore.get(newReview.restaurant_id)
-        // .then( review => {
-        //   reviewStore.put(review);
-        // });
-      });
+      //Anything right after posting? Other function handles IDB stuffing
+
     }).catch( err => {
       console.log('no new review posted' );
       //if it can't post, give 'offline' message somewhere here
@@ -330,6 +331,7 @@ const dbPromise = idb.open('restaurant-db', 1, (upgradeDb) => {
   store.createIndex('by-image', 'photograph');
   store.createIndex('by-favs', 'is_favorite');
 
+  //Review store
   var reviewStore = upgradeDb.createObjectStore('reviews', {keyPath: 'id'});
   reviewStore.createIndex('by-restaurant', 'restaurant_id');
 
@@ -346,6 +348,7 @@ function stuffData(restaurants) {
     return tx.complete;
   });
 }
+//Probably need to rework the reviews to stuff them by Restaurant ID (maybe?)
 function stuffReviewData(reviews) {
   dbPromise.then(function(db){
     var tx = db.transaction('reviews', 'readwrite');

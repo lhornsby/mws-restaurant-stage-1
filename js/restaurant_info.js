@@ -77,10 +77,8 @@ favRestaurant = (restaurant = self.restaurant) => {
     const favStatus = (restaurant.is_favorite && restaurant.is_favorite.toString() === "true") ? true : false;
     restaurant.is_favorite = !favStatus;
     DBHelper.updateFav(restaurant.id, restaurant.is_favorite);
-    //debugger;
     changeFavBtn(favBtn, restaurant.is_favorite);
   }
-//  debugger;
   changeFavBtn(favBtn, restaurant.is_favorite);
 }
 
@@ -239,15 +237,19 @@ submitReview = () => {
   const reviewData = {
     "restaurant_id": parseInt(reviewRest.value),
     "name": reviewName.value,
+    "createdAt": Date.now(),
     "rating": parseInt(ratingValue),
     "comments": reviewComments.value,
-    "createdAt": Date.now(),
   }
-  console.log('datas', reviewData);
-  //DBHelper function to submit to db next (checks if online or not)
+  //console.log('datas', reviewData);
+  //DBHelper function to submit to db if we're online
   DBHelper.postNewReview(reviewData);
+  //if not online, jam in a "Pending" or "Offline" message above the new HTML
+
   //add to actual page
   document.getElementById('reviews-list').appendChild(createReviewHTML(reviewData));
+  //remember to reset the form after the data posts
+  document.getElementById('reviews-form').reset();
 }
 
 
