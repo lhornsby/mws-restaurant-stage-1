@@ -46,8 +46,7 @@ class DBHelper {
           restaurantStore.getAll().then(restaurantsIdb => {
             callback(null, restaurantsIdb);
           });
-
-      });
+        });
     });
   }
 
@@ -105,6 +104,13 @@ class DBHelper {
       callback(null, reviews);
     }).catch(err => {
       console.log('no fetch for you on this detail page!');
+      dbPromise.then(db => {
+        const tx = db.transaction("reviews", "readonly");
+        const reviewsStore = tx.objectStore("reviews");
+        reviewsStore.getAll().then(reviewsIdb => {
+          callback(null, reviewsIdb);
+        });
+      });
     });
   }
 
@@ -126,8 +132,8 @@ class DBHelper {
         });
         if (review) {
           callback(null, review);
-          //Stuff data into IDB
-          stuffReviewData(review);
+          // //Stuff data into IDB
+           stuffReviewData(review);
         } else {
           callback('No Review Found', null);
         }
@@ -324,17 +330,19 @@ class DBHelper {
 }
 
 /* Setup IDB */
-const dbPromise = idb.open('restaurant-db', 1, (upgradeDb) => {
-
-  var store = upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
-  store.createIndex('by-name', 'name');
-  store.createIndex('by-image', 'photograph');
-  store.createIndex('by-favs', 'is_favorite');
-
-  //Review store
-  var reviewStore = upgradeDb.createObjectStore('reviews', {keyPath: 'id'});
-  reviewStore.createIndex('by-restaurant', 'restaurant_id');
-
+const dbPromise = idb.open('restaurant-db', 2, (upgradeDb) => {
+  //Need to upgrade the DB version since
+  switch (upgradeDb.oldVersion) {
+    case 0:
+      var store = upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
+      store.createIndex('by-name', 'name');
+      store.createIndex('by-image', 'photograph');
+      store.createIndex('by-favs', 'is_favorite');
+    case 1:
+      //Review store
+      var reviewStore = upgradeDb.createObjectStore('reviews', {keyPath: 'id'});
+      reviewStore.createIndex('by-restaurant', 'restaurant_id');
+  }
 });
 /* Stuff in some data */
 function stuffData(restaurants) {

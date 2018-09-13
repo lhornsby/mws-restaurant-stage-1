@@ -204,7 +204,6 @@ createReviewHTML = (review) => {
   comments.className = 'review-comments';
   comments.innerHTML = review.comments;
   li.appendChild(comments);
-    console.log('review html added');
   return li;
 
 }
@@ -220,7 +219,6 @@ reviewForm = (restaurant=self.restaurant) => {
 }
 submitReview = () => {
   event.preventDefault();
-  console.log('review submit btn press');
   //get values from form fields
   const reviewRest = document.querySelector("input[name='restaurant_id']");
   const reviewName = document.querySelector("input[name='name']");
@@ -241,7 +239,6 @@ submitReview = () => {
     "rating": parseInt(ratingValue),
     "comments": reviewComments.value,
   }
-  //console.log('datas', reviewData);
   //DBHelper function to submit to db if we're online
   DBHelper.postNewReview(reviewData);
   //if not online, jam in a "Pending" or "Offline" message above the new HTML
