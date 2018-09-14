@@ -186,11 +186,13 @@ createReviewHTML = (review) => {
   name.innerHTML = review.name;
   li.appendChild(name);
 
+
   let reviewDate = new Date(review.createdAt);
   let reviewFormatDate = reviewDate.toLocaleDateString();
 
   const date = document.createElement('p');
   date.className = 'review-date';
+
   //make a new Date to translate the createdAt data
   date.innerHTML = reviewFormatDate; //previously review.date in Stage 2
   li.appendChild(date);
@@ -242,9 +244,17 @@ submitReview = () => {
   //DBHelper function to submit to db if we're online
   DBHelper.postNewReview(reviewData);
   //if not online, jam in a "Pending" or "Offline" message above the new HTML
-
-  //add to actual page
-  document.getElementById('reviews-list').appendChild(createReviewHTML(reviewData));
+  if (!navigator.onLine) {
+    console.log('offline!!!');
+    //find review-name, jam in class 'pending-review' ?
+    const pendingMessage = document.createElement('p');
+    pendingMessage.className = 'pending-review';
+    pendingMessage.innerHTML = `OFFLINE: Review is pending`;
+    document.getElementById('reviews-list').appendChild(pendingMessage);
+    document.getElementById('reviews-list').appendChild(createReviewHTML(reviewData));
+  } else {
+    document.getElementById('reviews-list').appendChild(createReviewHTML(reviewData));
+  }
   //remember to reset the form after the data posts
   document.getElementById('reviews-form').reset();
 }

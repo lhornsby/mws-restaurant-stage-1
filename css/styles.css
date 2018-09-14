@@ -548,6 +548,13 @@ fieldset label {
 	padding: 10px;
 	letter-spacing: 2px;
 }
+.pending-review {
+  background-color: #AD1A00;
+  color: #fff;
+  padding: 10px;
+  width: 85%;
+  margin-bottom: 5px;
+}
 .review-rating,
 .review-date {
 	display: inline-block;
