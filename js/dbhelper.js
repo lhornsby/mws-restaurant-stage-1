@@ -157,8 +157,19 @@ class DBHelper {
 
     }).catch( err => {
       console.log('no new review posted' );
-      //if it can't post, give 'offline' message somewhere here
-
+    });
+  }
+  /**
+  * Offline Local Storage for Pending Review
+  */
+  static storePendingReview(newReview) {
+    console.log('new pending review', newReview);
+    //send the review to IDB in a Pending section
+    dbPromise.then(function(db){
+      var tx = db.transaction('pending-reviews', 'readwrite');
+      var reviewStore = tx.objectStore('pending-reviews');
+      reviewStore.put(newReview);
+      return tx.complete;
     });
   }
 
@@ -330,7 +341,7 @@ class DBHelper {
 }
 
 /* Setup IDB */
-const dbPromise = idb.open('restaurant-db', 2, (upgradeDb) => {
+const dbPromise = idb.open('restaurant-db', 3, (upgradeDb) => {
   //Need to upgrade the DB version since
   switch (upgradeDb.oldVersion) {
     case 0:
@@ -342,6 +353,9 @@ const dbPromise = idb.open('restaurant-db', 2, (upgradeDb) => {
       //Review store
       var reviewStore = upgradeDb.createObjectStore('reviews', {keyPath: 'id'});
       reviewStore.createIndex('by-restaurant', 'restaurant_id');
+    case 2:
+      //pending reviews
+      var pendingStore = upgradeDb.createObjectStore('pending-reviews', {keyPath: 'restaurant_id'});
   }
 });
 /* Stuff in some data */

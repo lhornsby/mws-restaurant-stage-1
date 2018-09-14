@@ -241,18 +241,21 @@ submitReview = () => {
     "rating": parseInt(ratingValue),
     "comments": reviewComments.value,
   }
-  //DBHelper function to submit to db if we're online
-  DBHelper.postNewReview(reviewData);
+
   //if not online, jam in a "Pending" or "Offline" message above the new HTML
   if (!navigator.onLine) {
     console.log('offline!!!');
-    //find review-name, jam in class 'pending-review' ?
+    //run function to stuff review somewhere, then wait and submit later with a different function
+    DBHelper.storePendingReview(reviewData);
+    //find review-name, jam in class 'pending-review'
     const pendingMessage = document.createElement('p');
     pendingMessage.className = 'pending-review';
     pendingMessage.innerHTML = `OFFLINE: Review is pending`;
     document.getElementById('reviews-list').appendChild(pendingMessage);
     document.getElementById('reviews-list').appendChild(createReviewHTML(reviewData));
   } else {
+    //DBHelper function to submit to db if we're online
+    DBHelper.postNewReview(reviewData);
     document.getElementById('reviews-list').appendChild(createReviewHTML(reviewData));
   }
   //remember to reset the form after the data posts
