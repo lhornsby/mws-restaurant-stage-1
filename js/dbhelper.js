@@ -92,7 +92,6 @@ class DBHelper {
   */
   static fetchRestaurantDetailReview(id, callback){
     var detailPageReviewURL = DBHelper.REVIEWS_URL + `/?restaurant_id=${id}`;
-    console.log('detail url', detailPageReviewURL);
     fetch(detailPageReviewURL)
     .then(function(response) {
       if (!response.ok) {
@@ -146,8 +145,6 @@ class DBHelper {
   */
   static postNewReview(newReview){
     const reviewURL = DBHelper.REVIEWS_URL;
-     console.log('review data to dbhelper', newReview);
-     debugger;
     //add the parameters of the data to the fetch options cuz it's not going now
     fetch(reviewURL, {
       method: 'POST',
@@ -166,22 +163,6 @@ class DBHelper {
   static storePendingReview(newReview) {
     //send the pending review to LocalStorage with the Created At data to separate them
     localStorage.setItem('pendingReview' + newReview.createdAt, JSON.stringify(newReview) );
-    // add an eventListener for if the site is online
-    // so looks in local storage to send reviews
-    window.addEventListener('online', function(event) {
-      console.log('back online!');
-      if (localStorage.length) {
-        const pendingKeys = Object.keys(localStorage);
-        pendingKeys.forEach(key => {
-          //parse it so it's not a gross string anymore
-          let singleReview = JSON.parse( localStorage.getItem(key) );
-          DBHelper.postNewReview(singleReview);
-          //Delete them from local storage so they don't
-          //get jammed in again later when they've been sent already
-          localStorage.removeItem(singleReview);
-        });
-      }
-    });
   }
 
   /**
@@ -235,7 +216,6 @@ class DBHelper {
         callback(null, results);
         //Error message in case there's no matching filterable results
         if (results === undefined || results.length === 0) {
-          //console.log('empty results');
           const message = document.getElementById('no-results-message');
           message.innerHTML = 'No results for current filter.';
           message.setAttribute('aria-hidden', 'false');

@@ -39,6 +39,26 @@ window.initMap = () => {
   });
 }
 
+//Listening to see if we need to get pending reviews
+window.addEventListener("load", function(e){
+  // add an eventListener for if the site is online
+  // so looks in local storage to send reviews
+  window.addEventListener('online', function(event) {
+    console.log('back online!');
+    if (localStorage.length) {
+      const pendingKeys = Object.keys(localStorage);
+      pendingKeys.forEach(key => {
+        //parse it so it's not a gross string anymore
+        let singleReview = JSON.parse( localStorage.getItem(key) );
+        DBHelper.postNewReview(singleReview);
+        //Delete them from local storage so they don't
+        //get jammed in again later when they've been sent already
+        localStorage.removeItem(singleReview);
+      });
+    }
+  });
+});
+
 /**
  * Get current restaurant from page URL.
  */
