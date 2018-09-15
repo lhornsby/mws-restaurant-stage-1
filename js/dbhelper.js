@@ -146,7 +146,8 @@ class DBHelper {
   */
   static postNewReview(newReview){
     const reviewURL = DBHelper.REVIEWS_URL;
-    // console.log('review data to dbhelper', newReview);
+     console.log('review data to dbhelper', newReview);
+     debugger;
     //add the parameters of the data to the fetch options cuz it's not going now
     fetch(reviewURL, {
       method: 'POST',
@@ -163,13 +164,23 @@ class DBHelper {
   * Offline Local Storage for Pending Review
   */
   static storePendingReview(newReview) {
-    console.log('new pending review', newReview);
-    //send the review to IDB in a Pending section
-    dbPromise.then(function(db){
-      var tx = db.transaction('pending-reviews', 'readwrite');
-      var reviewStore = tx.objectStore('pending-reviews');
-      reviewStore.put(newReview);
-      return tx.complete;
+    //send the pending review to LocalStorage with the Created At data to separate them
+    localStorage.setItem('pendingReview' + newReview.createdAt, JSON.stringify(newReview) );
+    // add an eventListener for if the site is online
+    // so looks in local storage to send reviews
+    window.addEventListener('online', function(event) {
+      console.log('back online!');
+      if (localStorage.length) {
+        const pendingKeys = Object.keys(localStorage);
+        pendingKeys.forEach(key => {
+          //parse it so it's not a gross string anymore
+          let singleReview = JSON.parse( localStorage.getItem(key) );
+          DBHelper.postNewReview(singleReview);
+          //Delete them from local storage so they don't
+          //get jammed in again later when they've been sent already
+          localStorage.removeItem(singleReview);
+        });
+      }
     });
   }
 
@@ -341,7 +352,7 @@ class DBHelper {
 }
 
 /* Setup IDB */
-const dbPromise = idb.open('restaurant-db', 3, (upgradeDb) => {
+const dbPromise = idb.open('restaurant-db', 2, (upgradeDb) => {
   //Need to upgrade the DB version since
   switch (upgradeDb.oldVersion) {
     case 0:
@@ -353,9 +364,6 @@ const dbPromise = idb.open('restaurant-db', 3, (upgradeDb) => {
       //Review store
       var reviewStore = upgradeDb.createObjectStore('reviews', {keyPath: 'id'});
       reviewStore.createIndex('by-restaurant', 'restaurant_id');
-    case 2:
-      //pending reviews
-      var pendingStore = upgradeDb.createObjectStore('pending-reviews', {keyPath: 'restaurant_id'});
   }
 });
 /* Stuff in some data */
