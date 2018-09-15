@@ -1,4 +1,5 @@
 let restaurant;
+let reviews;
 var map;
 
 
@@ -38,6 +39,26 @@ window.initMap = () => {
   });
 }
 
+//Listening to see if we need to get pending reviews
+window.addEventListener("load", function(e){
+  // add an eventListener for if the site is online
+  // so looks in local storage to send reviews
+  window.addEventListener('online', function(event) {
+    console.log('back online!');
+    if (localStorage.length) {
+      const pendingKeys = Object.keys(localStorage);
+      pendingKeys.forEach(key => {
+        //parse it so it's not a gross string anymore
+        let singleReview = JSON.parse( localStorage.getItem(key) );
+        DBHelper.postNewReview(singleReview);
+        //Delete them from local storage so they don't
+        //get jammed in again later when they've been sent already
+        localStorage.removeItem(singleReview);
+      });
+    }
+  });
+});
+
 /**
  * Get current restaurant from page URL.
  */
@@ -64,12 +85,42 @@ fetchRestaurantFromURL = (callback) => {
 }
 
 /**
+* Favorite Restaurant Functionality
+*/
+const favBtn = document.getElementById('restaurant-fav');
+favRestaurant = (restaurant = self.restaurant) => {
+  //Change out the icon / text based on if is_fav is set
+  // un-filled heart icon: far fa-heart
+  // filled heart icon: fas fa-heart
+  //have to check if it's a string value because Json Responses will do that to ya
+  favBtn.onclick = () => {
+    const favStatus = (restaurant.is_favorite && restaurant.is_favorite.toString() === "true") ? true : false;
+    restaurant.is_favorite = !favStatus;
+    DBHelper.updateFav(restaurant.id, restaurant.is_favorite);
+    changeFavBtn(favBtn, restaurant.is_favorite);
+  }
+  changeFavBtn(favBtn, restaurant.is_favorite);
+}
+
+changeFavBtn = (btn, favStatus) => {
+  if (favStatus) {
+    favBtn.setAttribute('aria-label', 'Unfavorite This Restaurant');
+    favBtn.innerHTML = '&#9829; UnFav';
+    favBtn.className = 'btn-favorited';
+  } else {
+    favBtn.setAttribute('aria-label', 'Favorite This Restaurant');
+    favBtn.innerHTML = '&#9829; Fav';
+    favBtn.className = '';
+  }
+}
+
+/**
  * Create restaurant HTML and add it to the webpage
  */
 fillRestaurantHTML = (restaurant = self.restaurant) => {
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
-
+  favRestaurant();
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
 
@@ -96,7 +147,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
     fillRestaurantHoursHTML();
   }
   // fill reviews
-  fillReviewsHTML();
+  DBHelper.fetchReviewByRestaurantID(restaurant.id, fillReviewsHTML);
 }
 
 /**
@@ -121,8 +172,11 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
 
 /**
  * Create all reviews HTML and add them to the webpage.
+ * previously used reviews = self.restaurant.reviews as param
  */
-fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+fillReviewsHTML = (error, reviews) => {
+  self.restaurant.reviews = reviews;
+
   const container = document.getElementById('reviews-container');
   const title = document.createElement('h2');
   title.innerHTML = 'Reviews';
@@ -139,6 +193,7 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
     ul.appendChild(createReviewHTML(review));
   });
   container.appendChild(ul);
+  reviewForm();
 }
 
 /**
@@ -151,9 +206,15 @@ createReviewHTML = (review) => {
   name.innerHTML = review.name;
   li.appendChild(name);
 
+
+  let reviewDate = new Date(review.createdAt);
+  let reviewFormatDate = reviewDate.toLocaleDateString();
+
   const date = document.createElement('p');
   date.className = 'review-date';
-  date.innerHTML = review.date;
+
+  //make a new Date to translate the createdAt data
+  date.innerHTML = reviewFormatDate; //previously review.date in Stage 2
   li.appendChild(date);
 
   const rating = document.createElement('p');
@@ -165,9 +226,62 @@ createReviewHTML = (review) => {
   comments.className = 'review-comments';
   comments.innerHTML = review.comments;
   li.appendChild(comments);
-
   return li;
+
 }
+/**
+* Handle Review Form submission
+*/
+reviewForm = (restaurant=self.restaurant) => {
+  //put current restaurant's id into hidden input field
+  const formID = document.getElementById('form-restaurant-id');
+  formID.value = restaurant.id;
+  //on form submit, handle through POST endpoint
+  // http://localhost:1337/reviews/
+}
+submitReview = () => {
+  event.preventDefault();
+  //get values from form fields
+  const reviewRest = document.querySelector("input[name='restaurant_id']");
+  const reviewName = document.querySelector("input[name='name']");
+  const reviewRating = document.querySelectorAll("input[name='rating']");
+  let ratingValue = '';
+  //need to look for "checked" value
+  for (var i = 0, length = reviewRating.length; i < length; i ++) {
+    if (reviewRating[i].checked) {
+      ratingValue = reviewRating[i].value;
+      break;
+    }
+  }
+  const reviewComments = document.querySelector("textarea[name='comments']");
+  const reviewData = {
+    "restaurant_id": parseInt(reviewRest.value),
+    "name": reviewName.value,
+    "createdAt": Date.now(),
+    "rating": parseInt(ratingValue),
+    "comments": reviewComments.value,
+  }
+
+  //if not online, jam in a "Pending" or "Offline" message above the new HTML
+  if (!navigator.onLine) {
+    console.log('offline!!!');
+    //run function to stuff review somewhere, then wait and submit later with a different function
+    DBHelper.storePendingReview(reviewData);
+    //find review-name, jam in class 'pending-review'
+    const pendingMessage = document.createElement('p');
+    pendingMessage.className = 'pending-review';
+    pendingMessage.innerHTML = `OFFLINE: Review is pending`;
+    document.getElementById('reviews-list').appendChild(pendingMessage);
+    document.getElementById('reviews-list').appendChild(createReviewHTML(reviewData));
+  } else {
+    //DBHelper function to submit to db if we're online
+    DBHelper.postNewReview(reviewData);
+    document.getElementById('reviews-list').appendChild(createReviewHTML(reviewData));
+  }
+  //remember to reset the form after the data posts
+  document.getElementById('reviews-form').reset();
+}
+
 
 /**
  * Add restaurant name to the breadcrumb navigation menu

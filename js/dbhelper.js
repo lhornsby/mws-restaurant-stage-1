@@ -15,6 +15,15 @@ class DBHelper {
   }
 
   /**
+  * Reviews Endpoint
+  *
+  */
+  static get REVIEWS_URL() {
+    const port = 1337
+    return `http://localhost:${port}/reviews`;
+  }
+
+  /**
    * Fetch all restaurants.
    */
   //Use Fetch instead of XHR
@@ -37,8 +46,25 @@ class DBHelper {
           restaurantStore.getAll().then(restaurantsIdb => {
             callback(null, restaurantsIdb);
           });
+        });
+    });
+  }
 
-      });
+  /**
+  * Fetch all reviews
+  */
+  static fetchReviews(callback) {
+    fetch(DBHelper.REVIEWS_URL)
+    .then(function(response) {
+      if (!response.ok) {
+        throw Error(response.status);
+      }
+      return response.json();
+    }).then(function(data){
+      const reviews = data;
+      callback(null, reviews);
+    }).catch(err => {
+      console.log('no fetch for you!');
     });
   }
 
@@ -52,7 +78,6 @@ class DBHelper {
         callback(error, null);
       } else {
         const restaurant = restaurants.find(r => r.id == id);
-      //  debugger;
         if (restaurant) { // Got the restaurant
           callback(null, restaurant);
         } else { // Restaurant does not exist in the database
@@ -60,6 +85,84 @@ class DBHelper {
         }
       }
     });
+  }
+
+  /*
+  * Fetch Review For Restaurant Detail
+  */
+  static fetchRestaurantDetailReview(id, callback){
+    var detailPageReviewURL = DBHelper.REVIEWS_URL + `/?restaurant_id=${id}`;
+    fetch(detailPageReviewURL)
+    .then(function(response) {
+      if (!response.ok) {
+        throw Error(response.status);
+      }
+      return response.json();
+    }).then(function(data){
+      const reviews = data;
+      callback(null, reviews);
+    }).catch(err => {
+      console.log('no fetch for you on this detail page!');
+      dbPromise.then(db => {
+        const tx = db.transaction("reviews", "readonly");
+        const reviewsStore = tx.objectStore("reviews");
+        reviewsStore.getAll().then(reviewsIdb => {
+          callback(null, reviewsIdb);
+        });
+      });
+    });
+  }
+
+  /**
+  * Fetch a review by the Restaurant ID
+  * endpoint is http://localhost:1337/reviews/?restaurant_id=1
+  */
+  //USE THIS TO FILL IDB
+  static fetchReviewByRestaurantID(id, callback){
+    DBHelper.fetchRestaurantDetailReview( id, (error, reviews) => {
+      if (error) {
+        callback(error, null);
+      } else {
+        //Find only the reviews that have the current restaurant id
+        const review = reviews.filter( function(r) {
+          if (r.restaurant_id == id) {
+            return r;
+          }
+        });
+        if (review) {
+          callback(null, review);
+          // //Stuff data into IDB
+           stuffReviewData(review);
+        } else {
+          callback('No Review Found', null);
+        }
+      }
+    });
+  }
+
+  /**
+  * POST new review
+  */
+  static postNewReview(newReview){
+    const reviewURL = DBHelper.REVIEWS_URL;
+    //add the parameters of the data to the fetch options cuz it's not going now
+    fetch(reviewURL, {
+      method: 'POST',
+      body: JSON.stringify(newReview),
+    })
+    .then( () => {
+      //Anything right after posting? Other function handles IDB stuffing
+
+    }).catch( err => {
+      console.log('no new review posted' );
+    });
+  }
+  /**
+  * Offline Local Storage for Pending Review
+  */
+  static storePendingReview(newReview) {
+    //send the pending review to LocalStorage with the Created At data to separate them
+    localStorage.setItem('pendingReview' + newReview.createdAt, JSON.stringify(newReview) );
   }
 
   /**
@@ -113,7 +216,6 @@ class DBHelper {
         callback(null, results);
         //Error message in case there's no matching filterable results
         if (results === undefined || results.length === 0) {
-          //console.log('empty results');
           const message = document.getElementById('no-results-message');
           message.innerHTML = 'No results for current filter.';
           message.setAttribute('aria-hidden', 'false');
@@ -190,6 +292,30 @@ class DBHelper {
   }
 
   /**
+  * Restaurant favorite call
+  */
+  static updateFav(id, favState) {
+    const favURL = DBHelper.DATABASE_URL + `/${id}/?is_favorite=${favState}`;
+    //PUT that URL up there at some point
+    fetch(favURL, {method: 'PUT'})
+    .then( () => {
+      //access the restaurant store
+      dbPromise.then(function(db){
+        var tx = db.transaction('restaurants', 'readwrite');
+        var restaurantStore = tx.objectStore('restaurants');
+        //put new fav status based on restaurant id
+        restaurantStore.get(id)
+        .then( restaurant => {
+          restaurant.is_favorite = favState;
+          restaurantStore.put(restaurant);
+        });
+      });
+    }).catch( err => {
+      console.log('no favoriting');
+    });
+  }
+
+  /**
    * Map marker for a restaurant.
    */
   static mapMarkerForRestaurant(restaurant, map) {
@@ -206,12 +332,19 @@ class DBHelper {
 }
 
 /* Setup IDB */
-const dbPromise = idb.open('restaurant-db', 1, (upgradeDb) => {
-
-  var store = upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
-  store.createIndex('by-name', 'name');
-  store.createIndex('by-image', 'photograph');
-
+const dbPromise = idb.open('restaurant-db', 2, (upgradeDb) => {
+  //Need to upgrade the DB version since
+  switch (upgradeDb.oldVersion) {
+    case 0:
+      var store = upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
+      store.createIndex('by-name', 'name');
+      store.createIndex('by-image', 'photograph');
+      store.createIndex('by-favs', 'is_favorite');
+    case 1:
+      //Review store
+      var reviewStore = upgradeDb.createObjectStore('reviews', {keyPath: 'id'});
+      reviewStore.createIndex('by-restaurant', 'restaurant_id');
+  }
 });
 /* Stuff in some data */
 function stuffData(restaurants) {
@@ -221,6 +354,18 @@ function stuffData(restaurants) {
 
     for (var restaurant in restaurants) {
       restaurantStore.put(restaurants[restaurant]);
+    }
+    return tx.complete;
+  });
+}
+//Probably need to rework the reviews to stuff them by Restaurant ID (maybe?)
+function stuffReviewData(reviews) {
+  dbPromise.then(function(db){
+    var tx = db.transaction('reviews', 'readwrite');
+    var reviewStore = tx.objectStore('reviews');
+
+    for (var review in reviews) {
+      reviewStore.put(reviews[review]);
     }
     return tx.complete;
   });

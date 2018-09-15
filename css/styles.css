@@ -118,7 +118,7 @@ nav h1 a {
 .breadcrumb {
     padding: 10px 40px 16px;
     list-style: none;
-    background-color: #e8e8e8;
+    background-color: #ffffff;
     font-size: 17px;
     margin: 0;
 		border-bottom: 1px solid #333333;
@@ -142,7 +142,7 @@ nav h1 a {
 
 /* Add a color to all links detail-page the list */
 .breadcrumb li a {
-    color: #398ed6;
+    color: #1C5B91;
     text-decoration: none;
 }
 
@@ -299,6 +299,31 @@ nav h1 a {
   text-align: center;
 }
 
+button,
+input[type="submit"] {
+  background-color: #155C8E;
+  padding: 10px 20px;
+  font-size: 14px;
+  border: 0;
+  margin: 5px 0;
+  color: #fff;
+  cursor: pointer;
+  display: block;
+}
+
+button:hover,
+input[type="submit"]:hover {
+  background-color: #0E4871;
+}
+
+.btn-favorited {
+  background-color: #d0462e;
+}
+
+.btn-favorited:hover {
+  background-color: #b73a24;
+}
+
 @media screen and (min-width: 600px) and (max-width:899px) {
 	#restaurants-list {
 		grid-template-columns: 1fr 1fr;
@@ -407,7 +432,7 @@ nav h1 a {
 	grid-area: restaurant-container;
 }
 .detail-name {
-  color: #ce7407;
+  color: #333;
   font-family: Arial,sans-serif;
   font-size: 24px;
   font-weight: 200;
@@ -441,11 +466,56 @@ nav h1 a {
   padding: 140px 40px 30px;
   width: 50%;
 }
-.reviews-container {
+#reviews-form-container {
   padding: 30px 40px 80px;
+  width: 50%;
+}
+#reviews-form-container h3 {
+  color: #333;
+}
+/*Form Stuff on Reviews */
+form {
+  margin-bottom: 30px;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+}
+input,
+textarea {
+  padding: 10px;
+  font-size: 16px;
+}
+input[type="text"],
+textarea {
+  width: 100%;
+}
+textarea {
+  min-height: 150px;
+}
+fieldset {
+  border: none;
+  margin: 10px 0;
+  padding: 0;
+}
+fieldset legend {
+  font-weight: bold;
+}
+fieldset label,
+fieldset input {
+  display: inline-block;
+}
+fieldset label {
+  margin-right: 20px;
+  font-weight: normal;
+}
+
+.reviews-container {
+  padding: 30px 40px 30px;
 }
 .reviews-container h2 {
-  color: #ce7407;
+  color: #333;
   font-size: 22px;
   font-weight: 300;
   letter-spacing: 0px;
@@ -478,6 +548,13 @@ nav h1 a {
 	padding: 10px;
 	letter-spacing: 2px;
 }
+.pending-review {
+  background-color: #AD1A00;
+  color: #fff;
+  padding: 10px;
+  width: 85%;
+  margin-bottom: 5px;
+}
 .review-rating,
 .review-date {
 	display: inline-block;
@@ -502,7 +579,9 @@ nav h1 a {
 		width: 100%;
 		top: 120px;
 	}
-	.detail-container, .reviews-container {
+	.detail-container,
+  .reviews-container,
+  #reviews-form-container {
 		width: auto;
 	}
 	.detail-hours {
